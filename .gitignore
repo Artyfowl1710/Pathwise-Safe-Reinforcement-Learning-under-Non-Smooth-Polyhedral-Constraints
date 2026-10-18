@@ -42,3 +42,11 @@ Thumbs.db
 # Private / restricted datasets (ACN license forbids redistribution)
 data/*_local_sessions.csv
 !data/templates/
+
+# LaTeX build artifacts
+*.aux
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+

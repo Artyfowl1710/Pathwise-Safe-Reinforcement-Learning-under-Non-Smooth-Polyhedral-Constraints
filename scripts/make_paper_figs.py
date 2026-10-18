@@ -23,7 +23,7 @@ def H(f):
                 viol_projected=float(v("safe_uncontrolled").mean()), cost_cap=cap, cost_proj_unc=proj, cost_oracle=o, clairvoyant_best_heuristic=float(np.min([c(k) for k in caps + ["safe_uncontrolled"]], axis=0).mean()))
 Hs = {"Caltech": H(S + "headroom_caltech_stress_fixed.json"), "JPL": H(S + "headroom_jpl_stress_fixed.json")}
 fig, ax = plt.subplots(figsize=(4.6, 2.2)); x = np.arange(2); w = .26
-for i, (k, lab, col) in enumerate((("H_unprojected_admitted", "unprojected rule admitted (old script)", C[3]), ("H_caps_only", "EDF caps only", C[1]), ("H_final", "violation-free incl. projected rule (final)", C[0]))):
+for i, (k, lab, col) in enumerate((("H_unprojected_admitted", "unprojected rule admitted", C[3]), ("H_caps_only", "EDF caps only", C[1]), ("H_final", "violation-free, incl. projected rule", C[0]))):
     ax.bar(x + (i - 1) * w, [Hs[n][k] for n in Hs], w, color=col, label=lab)
 ax.set_xticks(x); ax.set_xticklabels(list(Hs)); ax.set_ylabel("headroom H (%)"); ax.legend(frameon=False, fontsize=6); plt.tight_layout(); plt.savefig(O + "fig_headroom_gating.pdf"); plt.close()
 json.dump(Hs, open(S + "headroom_gating_summary.json", "w"), indent=1)

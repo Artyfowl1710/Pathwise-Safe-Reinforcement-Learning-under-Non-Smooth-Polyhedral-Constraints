@@ -168,7 +168,8 @@ def rollout_cost(batch, policy, cfg, s_base_kw, demand_charge, c_unmet, restore=
             (site_prev / capn).unsqueeze(1).expand(B, K), (peak / capn).unsqueeze(1).expand(B, K)], dim=2)
         u = policy(feat, t)
         if base is not None:                                            # residual policy: u = clip(base + beta * delta), delta in [-1,1] from the network
-            x_ = base_fraction(base, pmax, need, tl, occ, budget_pu) + beta_res * u
+            bp_ = (base * pmax.sum(1, keepdim=True)) if isinstance(budget_pu, str) else budget_pu     # 'dyn': cap = base x instantaneous sum of port limits (synthetic-site convention)
+            x_ = base_fraction(base, pmax, need, tl, occ, bp_) + beta_res * u
             u = x_.clamp(0.0, 1.0).detach() + (x_ - x_.detach()) * ((x_ >= 0.0) & (x_ <= 1.0)).double()   # clamp with an INCLUSIVE-boundary gradient: torch.clamp has zero gradient exactly at the bound, which is where the reference rule sits (u in {0,1})
         p = u * pmax
         if restore:

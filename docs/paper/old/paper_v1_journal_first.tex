@@ -1,0 +1,330 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx,booktabs,amsmath,amssymb,amsthm,hyperref,enumitem,xcolor,array,tabularx,multirow}
+\hypersetup{colorlinks,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black}
+\setlist{itemsep=2pt,topsep=3pt}\emergencystretch=3em
+\setlength{\parskip}{4pt}\setlength{\parindent}{0pt}
+\newtheorem{prop}{Proposition}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\title{How Much Is Left to Learn? Headroom-Gated, Conformally Safe and Differentiable Dispatch for Network-Constrained EV Charging Hubs}
+\author{Mihir Khatri\thanks{Corresponding author: mihir.khatri24@spit.ac.in}\\ \small Sardar Patel Institute of Technology (SPIT), Mumbai, India\\[4pt]
+Rajesh Kolluri\\ \small Indian Institute of Information Technology, Design and Manufacturing (IIITDM) Kancheepuram, Chennai, India}
+\date{}
+\begin{document}\maketitle
+
+\begin{abstract}
+Charging hubs that serve many electric vehicles (EVs) from one distribution feeder must respect voltage and thermal limits while keeping energy and peak-demand costs low. Reinforcement learning (RL) is widely reported to beat heuristics on this task, but the heuristics are often untuned and the safety guarantees are rarely checked against an exact network solution. We ask a more basic question: how much is there to learn, and can a learned policy be made safe cheaply? Our setting is the IEEE 33-bus feeder with real sessions from two sites of the ACN-Data corpus (Caltech and JPL). We contribute four things. First, a calibrated safety layer: a fixed split-conformal margin on the LinDistFlow-to-AC voltage error loses coverage under load shift (0.15, 0.08 and 0.06 whole-stream coverage at 1.0, 1.25 and 1.5 times the calibration load, target 0.95), adaptive conformal inference restores it, and the margin it needs grows almost exactly as the square of the load ratio, which is the signature of the $I^2R$ term that LinDistFlow omits. Independent row-wise margins reach only 0.93 joint coverage at a 0.99 target; Bonferroni and a rating-normalised score restore it. Second, headroom-gated evaluation: we define headroom against a train-tuned, violation-free reference and find it small on real days (1.7 to 7.7\%). Third, a differentiable PyTorch twin of the feeder-and-hub rollout that matches the simulator to $10^{-16}$ and supports pathwise policy gradients; these beat the tuned reference by 10 to 14\% where headroom is 33\% (synthetic stress days) and recover only part of that on real days. Fourth, a residual physics-plus-network world model whose grid correction cuts the 1\% conformal voltage margin 2.6 times and the branch margin 9.8 times in one-step tests. We report negative and mixed results alongside positive ones and release code, data recipes and checksums.
+\end{abstract}
+\textbf{Keywords:} electric vehicle charging, distribution network, safe reinforcement learning, conformal prediction, differentiable simulation, LinDistFlow, headroom.
+
+%% =====================================================================
+\section{Introduction}
+Public and workplace charging hubs are growing quickly, and a hub with tens of chargers on one feeder can push voltages below limits or overload a branch within minutes. A dispatcher therefore has to decide, every 15 minutes, how much power each plugged-in vehicle receives, so that each driver's energy requirement is met by departure, the energy bill and the peak-demand charge are small, and the network stays inside its limits. This is a constrained sequential decision problem with exogenous, partly predictable arrivals.
+
+Reinforcement learning is an attractive tool because it can learn a feedback policy directly from data and, in principle, handle uncertainty that model predictive control (MPC) treats poorly. Many recent papers report large gains over rule-based or MPC baselines. Our reading of that literature raised three concerns. The baselines are often not tuned on the training days with the same effort that the learner receives. Safety is frequently enforced in expectation (a penalty), or through a surrogate network model whose error against an exact power-flow solution is not measured. And almost no paper reports how much a learned policy could gain at most, so a small gain cannot be told apart from a large missed opportunity.
+
+We started this project from the premise that a safe actor-critic agent with a differentiable quadratic-programming (QP) safety layer would beat a good heuristic. The evidence did not support that premise on real sessions, and it led us to three more useful questions. How should a projection onto a linearised feasible set be calibrated when the true network response is nonlinear and the load shifts? How much can any causal policy gain over a tuned heuristic, and how is that quantity measured honestly? And does exact differentiability of the environment change the answer? This paper answers these questions on one feeder and two real sites, with every result tied to a script and a checksum.
+
+\paragraph{Summary of findings.} (i) Safety margins calibrated at one load level fail at higher load, adaptive conformal inference fixes coverage, and the margin growth it requires is physical rather than a defect. (ii) Against a train-tuned, violation-free reference, a clairvoyant linear program leaves 1.7 to 7.7\% on real days. (iii) A critic-based residual agent does not beat the tuned reference on those days. (iv) A differentiable twin trained with pathwise gradients does beat it by 10 to 14\% when headroom is 33\%, but the benefit on real days depends on how infeasible actions are restored to feasibility, and a restoration that is invariant to the scale of the action removes the learning signal. (v) A residual world model with a physics base shrinks the tail of the one-step prediction error, and hence the conformal margin, by a large factor.
+
+%% =====================================================================
+\section{Domain and Background}
+\subsection{EV charging hubs on a distribution feeder}
+A hub is a set of $K$ charging ports behind one or more feeder buses. Sessions arrive over the day with an arrival time, a departure time, an energy request and a maximum charging rate. Cost has three parts: energy bought at a time-varying price, a penalty for energy not delivered at departure, and a demand charge proportional to the day's peak power. Charging power is limited by the port rating and by the vehicle's state of charge (SoC), because charge acceptance falls near full. Several vehicles on one lateral lower the downstream voltage and load the branches upstream of them, so the ports are coupled through the network even when each vehicle's own problem is simple.
+
+\subsection{Feeder model}
+We use the balanced single-phase IEEE 33-bus radial feeder \cite{baranwu}. The exact branch-flow equations on a tree (DistFlow) \cite{farivar} are nonlinear in the squared voltage $v_i$ and the line flows $(P_{ij},Q_{ij})$. Dropping the loss terms gives the linear LinDistFlow model, in which squared voltages and branch flows are affine in the nodal injections. This linearity is what makes a fast safety projection possible, and its error is exactly the term we calibrate in Sec.~\ref{sec:conf}. Throughout, ``AC'' denotes the exact solution of the balanced branch-flow equations by backward-forward sweep; it excludes three-phase unbalance.
+
+\subsection{Safety layers and conformal prediction}
+A safety layer maps a policy's raw action to the nearest feasible action, here by solving a small QP \cite{optnet,cvxpylayers,dalal}. If the feasible set is built from a model, the guarantee is only as good as the model. Conformal prediction \cite{vovk,lei,angelopoulos} turns a held-out set of model errors into a quantile margin with finite-sample marginal coverage if the errors are exchangeable. Adaptive conformal inference (ACI) \cite{aci} updates the quantile online with a feedback rule and keeps long-run coverage without exchangeability, at the cost of a margin that adapts to the shift.
+
+\subsection{Differentiable simulation}
+If the environment is a composition of differentiable operations, a policy can be trained by backpropagating the episode cost through the rollout (an analytic or pathwise policy gradient) instead of estimating gradients from sampled returns \cite{heess,shac}. The estimate has lower variance than a score-function estimate but is biased or uninformative when the dynamics are discontinuous or stiff \cite{suh,metz}. The EV problem has such kinks (clipping at full charge, relu constraints, a running maximum for the demand charge), so differentiability must be checked rather than assumed.
+
+%% =====================================================================
+\section{Problem Statement}
+We consider day-ahead-unknown, real-time dispatch for a hub on a fixed feeder. The informal problem has three parts.
+
+\textbf{P1, safety under model mismatch.} The safety layer must keep the exact network inside its limits, but it only sees a linearised model. How large must the margin be, how does it behave when the load differs from the load at calibration, and what does one margin per constraint cost compared with a single global margin?
+
+\textbf{P2, how much can be gained.} For a policy that is causal and feasible, what is the largest possible improvement over the best heuristic that a practitioner would tune on the same training days? Without this number, ``RL beats the baseline'' has no scale.
+
+\textbf{P3, which learning signal.} When there is something to gain, does a critic-based agent or a policy trained through a differentiable twin of the environment capture it, and what in the twin's construction decides whether the gradient is informative?
+
+%% =====================================================================
+\section{Contributions}
+\begin{enumerate}
+\item \textbf{Calibrated, joint-coverage safety margins} for projection-based dispatch (Sec.~\ref{sec:conf}): a measurement of how fixed split-conformal margins fail under load shift, an ACI remedy, a physical explanation of the required margin growth, a test of a load-normalised score, and a comparison of global, row-wise, Bonferroni and rating-normalised margins in terms of joint coverage.
+\item \textbf{Headroom-gated evaluation} (Sec.~\ref{sec:head}): a definition of headroom against a train-tuned, violation-free reference, applied to real Caltech and JPL days under three price sources, with the pitfalls we found (unprojected references, an LP that is not a lower bound).
+\item \textbf{A verified differentiable twin and the projection price} (Sec.~\ref{sec:twin}): exact-fidelity, gradient-checked rollout of the hub on the feeder; evidence that the restoration operator controls whether pathwise learning works.
+\item \textbf{A physics-plus-residual world model for calibration} (Sec.~\ref{sec:wm}): the learned grid correction shrinks the conformal margin by 2.6 to 9.8 times in one-step tests, while a learned SoC correction harms.
+\item \textbf{A quantified look at bidirectional V2G} (Sec.~\ref{sec:v2g}): a clairvoyant gain of 15\% against a causal rule that loses 16\%, which identifies a high-headroom regime.
+\item \textbf{A reproducible package}: pinned versions, tests, result files and SHA-256 checksums.
+\end{enumerate}
+Table~\ref{tab:status} states how strongly each claim is supported, so that readers can weigh them.
+\begin{table}[h]\centering\small
+\begin{tabular}{L{6.0cm}L{4.4cm}L{3.6cm}}\toprule
+Claim & Data & Support\\\midrule
+Fixed-margin coverage collapses under load shift; ACI restores it & IEEE-33 load stream, 20 seeds & Strong\\
+Required margin grows as the square of load & same & Strong\\
+Row-wise margins lack joint coverage; Bonferroni and normalised scores restore it & 32 branches, 2000 scenarios & Strong\\
+Headroom is 1.7 to 7.7\% on real days & 20 weekdays per site, 3 price sources & Moderate\\
+Residual TD3 does not beat the tuned reference & real Caltech, 3 seeds & Moderate (one budget)\\
+Twin matches simulator to $10^{-16}$ with correct gradients & synthetic and real days & Strong\\
+Pathwise learning beats tuned reference at 33\% headroom & synthetic stress, 3 seeds, 20 days & Moderate (synthetic)\\
+Restoration operator decides real-day learnability & JPL and Caltech, closed loop & Moderate (few seeds)\\
+Grid residual shrinks conformal margin 2.6 to 9.8 times & synthetic, one step, 3 seeds & Moderate\\\bottomrule
+\end{tabular}\caption{Claims and the strength of their support.}\label{tab:status}\end{table}
+
+%% =====================================================================
+\section{Related Work}
+\textbf{RL for EV charging with grid constraints.} Surveys of RL for demand response and EV charging report large gains over baselines \cite{vazquez}. EV2Gym \cite{ev2gym} provides a V2G simulator with heuristic, MPC and RL baselines but no power-flow model, and finds MPC best on the profit and satisfaction balance. ACN-Data and ACN-Sim \cite{acn,acnsim} supply real session logs and a simulator with network constraints for scheduling studies. The closest work to ours is PI-TD3 \cite{pitd3}, which trains the actor by backpropagating through $K$-step rollouts of a known power-flow and SoC model on 34- and 123-bus feeders. Multi-agent Lagrangian methods \cite{tlmappo} enforce voltage limits in expectation. A field trial of home energy management found rule-based, MPC and tree policies within 0.6\% of each other and an RL agent 25\% worse \cite{ruddick}.
+
+\textbf{Safe RL and projection layers.} Constrained MDPs and their algorithms \cite{garcia,achiam} enforce constraints during training in expectation. Action-correction layers \cite{dalal}, predictive safety filters \cite{wabersich} and differentiable optimisation layers \cite{optnet,cvxpylayers} enforce them per step given a model. Residual policy learning \cite{johannink,silverres} learns a correction on top of a hand-designed controller, which is the form we use for the critic-based baseline.
+
+\textbf{Conformal prediction in control.} Split conformal prediction \cite{vovk,lei} and ACI \cite{aci} are well established \cite{angelopoulos}. In control, ACI has set switching thresholds for learned safety filters \cite{acofi}, and conformal forecast intervals have been used inside stochastic MPC for charging hubs with a cost gain of about 0.8\% \cite{zapico}.
+
+\textbf{Differentiable simulation.} Pathwise gradients through simulators have been used for continuous control \cite{heess,shac,brax,difftaichi}. Their failure modes under discontinuities are documented \cite{suh,metz}. Differentiable AC power flow has been developed for simulation speed \cite{dpf}.
+
+\textbf{Distributed charging.} Decentralised EV charging with feeder constraints \cite{distev} and distributed optimal power flow by ADMM \cite{boyd} exploit radial structure for scalability.
+
+%% =====================================================================
+\section{Research Gap}
+Reading these works together leaves four gaps that this paper addresses.
+\begin{enumerate}
+\item \textbf{No scale for RL gains.} Reported gains are relative to baselines whose tuning budget and violation rate are unstated, and no work we found reports a perfect-foresight bound against a violation-free tuned reference on real sessions.
+\item \textbf{Calibration of the projection model.} Safety layers use a linearised network model, yet we found no study that measures the LinDistFlow-to-AC error of the projected action, calibrates it conformally, and examines coverage under load shift and across multiple constraints jointly. Our literature search covered arXiv and web-indexed venues in October 2026 and cannot prove absence.
+\item \textbf{Which restoration makes pathwise learning work.} PI-TD3 and related work use differentiable models, but the operator that maps infeasible actions back to the feasible set (and its effect on gradients) is not analysed against the exact projection.
+\item \textbf{Value of a physics prior for calibration.} Residual world models are usually judged by mean prediction error. Conformal margins depend on the tail, and the effect of a learned residual on the required margin has not been reported for this problem.
+\end{enumerate}
+
+%% =====================================================================
+\section{Methodology}
+Figure~\ref{fig:pipeline} summarises the pipeline. A policy proposes per-port power. A safety layer projects it onto the feasible set $\{p:\,Gp\le h\}$ built from LinDistFlow rows and conformal margins. The projected action is executed in a simulator that solves the exact balanced network. Three studies sit around this loop: calibration of the margins (Sec.~\ref{sec:conf}), measurement of headroom with a tuned reference and an LP oracle (Sec.~\ref{sec:head}), and learning with either a critic or the differentiable twin (Secs.~\ref{sec:rl} to~\ref{sec:wm}).
+\begin{figure}[h]\centering
+\fbox{\parbox{0.92\linewidth}{\centering\small
+\textbf{Policy} $\pi$ (rule, TD3, or pathwise MLP) $\;\rightarrow\;$ raw action $p$ $\;\rightarrow\;$ \textbf{safety layer}: project onto $Gp\le h$ with margins $\tau$ (LinDistFlow rows) $\;\rightarrow\;$ \textbf{simulator}: SoC update, cost, exact AC solve $\;\rightarrow\;$ violations $e=v_{\rm LDF}-v_{\rm AC}$ feed back to the conformal calibrator (ACI).\\[2pt]
+\textbf{Evaluation}: tuned violation-free reference and perfect-foresight LP give the headroom $H$; paired bootstrap over held-out days.}}
+\caption{Pipeline and evaluation loop.}\label{fig:pipeline}\end{figure}
+Every comparison uses the same days, the same price, the same safety layer and the same cost function. References are tuned on training days only. Reported differences are paired by day and carry bootstrap intervals; seeds are listed in each table.
+
+%% =====================================================================
+\section{Problem Formulation}\label{sec:form}
+\textbf{Sets and data.} Time steps $t=1,\dots,T$ of length $\Delta t=0.25$\,h ($T=96$ for synthetic days, $T=192$ for real days that include evening sessions). Ports $k=1,\dots,K$ ($K=54$). A session at port $k$ has arrival $a$, departure $d$, rating $\bar p_{k,t}$, battery capacity $C_k$, initial SoC $s_{k}^{0}$ and target $s_k^{\rm tgt}$. Occupancy $o_{k,t}\in\{0,1\}$ and these quantities depend on time only, not on the control.
+
+\textbf{State dynamics.} With charging power $p_{k,t}\ge0$,
+\begin{equation}
+s_{k,t+1}=\min\!\Big\{1,\; s_{k,t}+\eta(s_{k,t})\,\frac{p_{k,t}\Delta t}{C_k}\Big\},\qquad \eta(s)=\eta_0-\kappa\,(s-\tfrac12)^2,
+\end{equation}
+with $\eta_0=0.95$ and a small curvature $\kappa$. The power is limited by $0\le p_{k,t}\le \min\{\bar p_{k,t},\,(1-s_{k,t})C_k/(\eta_0\Delta t)\}\,o_{k,t}$.
+
+\textbf{Network constraints.} Let $x_t=\sum_k$ port injections mapped to buses. In LinDistFlow, the squared voltages and branch apparent-power surrogates are affine in $x_t$, so voltage limits $[0.95,1.05]$ p.u. and branch thermal limits (approximated by a polygon of cuts) can be written $G_t\,p_t\le h_t$, with $h_t$ containing the exogenous load, the ratings and the safety margins $\tau$.
+
+\textbf{Cost.} The daily cost is
+\begin{equation}
+J=\sum_{t}c_t\sum_k p_{k,t}\Delta t\;+\;\lambda_u\sum_{k,\text{sessions}}C_k\big(s^{\rm tgt}_k-s_{k,d}\big)_+\;+\;\lambda_{\rm pk}\max_t\sum_k p_{k,t},
+\end{equation}
+with price $c_t$, unmet-energy penalty $\lambda_u=2$\,\$/kWh and demand charge $\lambda_{\rm pk}=1.5$\,\$/kW-day unless a tariff gives another value.
+
+\textbf{Control problem.} Find a causal policy $p_t=\pi(\text{information up to }t)$ minimising $\mathbb E[J]$ subject to $G_tp_t\le h_t$ at every step, and subject to the exact AC network staying within limits.
+
+\textbf{Conformal calibration.} Let $e_t=\max_i\,(v^{\rm LDF}_{i,t}-v^{\rm AC}_{i,t})$ be the one-sided voltage error and $S_t$ the same for branch flows. The margin $\tau$ added to $h_t$ should satisfy $\Pr(\text{AC limits hold at all rows at time }t)\ge1-\alpha$.
+
+\textbf{Headroom.} Let $J_{\rm ref}$ be the mean cost, on held-out days, of the best violation-free heuristic selected on training days, and $J_{\rm LP}$ the mean cost of a perfect-foresight LP solved on the same network rows. Define
+\begin{equation}
+H=\frac{J_{\rm ref}-J_{\rm LP}}{J_{\rm ref}}.
+\end{equation}
+Under the LP's model no causal violation-free policy can gain more than $H$ in expectation. Because the LP omits the efficiency curve $\eta(s)$ and treats the day as a single convex problem, it is not a lower bound on the simulator cost, and we report where it is beaten.
+
+%% =====================================================================
+\section{Proposed Methods}
+\subsection{Margins: ACI, row-wise and normalised scores}\label{sec:mmargin}
+We calibrate on pairs (LinDistFlow, AC) generated from a load stream. With score $s_t$ and level $1-\alpha$, ACI updates the working level $\alpha_{t+1}=\alpha_t+\gamma(\alpha-\mathbf 1[s_t>q_t])$ and sets the margin $q_t$ to the empirical $(1-\alpha_t)$ quantile of recent scores. For many constraints we compare four margins: one global margin on branch apparent power, independent row-wise margins at level $\alpha$, Bonferroni margins at level $\alpha/m$ for $m$ rows, and a single quantile of the rating-normalised maximum $\max_b e_b/\bar S_b$. We also test a load-normalised score $s_t/(g_t/g_{\rm nom})^k$, where $g_t$ is the observable total load and $k$ is fitted on the calibration set.
+
+\subsection{Headroom-gated evaluation}
+We tune three families on training days only: an earliest-deadline-first (EDF) power cap swept over a grid, the projected uncontrolled rule, and the best of them under a violation-free condition. A reference is admissible only if its mean violation on the training days is zero after projection through the same safety layer used by the learners. The LP oracle solves one convex program per day with perfect foresight of arrivals and prices.
+
+\subsection{Critic-based baseline}
+SafeTD3 is TD3 \cite{td3} with the QP layer after the actor and with a residual structure \cite{johannink,silverres}: action $=$ tuned EDF rule $+$ a bounded correction scaled by a residual factor. Dense reward shaping is potential-based \cite{ng}. Behaviour cloning pre-training and best-versus-last checkpoint selection are used.
+
+\subsection{Differentiable twin}\label{sec:twinmethod}
+Because admission and departure depend only on time, the day's cost is an almost-everywhere differentiable function of the action sequence once the exogenous data are fixed. We implement the rollout in float64 PyTorch: the SoC recursion with $\eta(s)$ and clipping, the energy cost, the unmet-energy penalty at departure, the demand charge as a running maximum, and the LinDistFlow rows $G_tp_t\le h_t$. The AC solve is not inside the twin; it is used only to evaluate executed actions in the simulator. An action that violates the rows must be restored to feasibility inside the rollout. We study three restorations:
+\begin{itemize}
+\item \textbf{Uniform ray scaling:} $p\leftarrow\alpha p$ with $\alpha=\min\{1,\min_i h_i/(Gp)_i\}$. Whenever a row binds, $\tilde p(cp)=\tilde p(p)$ for $c>0$ near the constraint, so $\nabla\tilde p\cdot p=0$: the cost does not depend on the overall scale of the action, and the policy receives no gradient along that direction.
+\item \textbf{Row-sensitive scaling (sens):} each violated row scales only the ports with $G_{ik}>0$, followed by a uniform step for guaranteed feasibility. A straight-through estimator keeps exact max and min in the forward pass and uses a log-sum-exp gradient backward.
+\item \textbf{Exact QP projection:} used by the simulator and by the tuned references; it is not scale-invariant, but it is not differentiable in the twin in our implementation.
+\end{itemize}
+The policy is a causal shared MLP applied to ten per-port features (price level and rank, SoC, deficit, time left, urgency, rating, site load, running peak) and trained by Adam on the mean cost over training days with no critic.
+
+\subsection{Residual world model}
+The world model predicts the next voltage, branch flow and SoC as $\hat s_{t+1}=F_{\rm base}(s_t,a_t)+N_\theta(s_t,a_t)$ with $F_{\rm base}$ the LinDistFlow and SoC recursion. $N_\theta$ is a small network whose output is scaled to a few percent of each variable's range and initialised near zero, trained with a mean-squared loss and an exact-KVL penalty on the corrected prediction. We compare $F_{\rm base}$ only, $F_{\rm base}+N_\theta$ with and without an SoC head, and a black-box network of larger capacity without the physics base.
+
+%% =====================================================================
+\section{Dataset}\label{sec:data}
+\textbf{Sessions.} ACN-Data \cite{acn}: the Caltech site (54 ports) and the JPL site (52 ports), covering 2018 to 2021, exported as session records (connection time, disconnection time, delivered energy, requested energy where present). Weekdays only. The 2020 lockdown makes 2020 atypical, so we also use a 2019-only chronological split.
+
+\textbf{Prices.} The price interface accepts four sources, each labelled in every table. (a) An SCE time-of-use stand-in schedule (default). (b) The SCE TOU-EV-4 schedule of March 2019, taken from the open-source \texttt{acnportal} package and applied to both sites and all years (an assumption; JPL's own tariff is not published there), including its demand charge. (c) The LBNL Wholesale Electricity Prices tool \cite{wep}, hourly CAISO, a system-level series rather than a nodal price. (d) Synthetic scenarios (duck, flat, volatile, solar glut). A file of daily peak blocks from an exchange was inspected and not used because it has no hourly resolution.
+
+\textbf{Feeder and load.} IEEE 33-bus \cite{baranwu} with its standard bus loads; hub ports are attached to three buses. ``Stress'' doubles EV load and caps hub capacity at two thirds of the site rating so that the network binds. Synthetic days are drawn from a session generator with the same interface as the real loader.
+
+\textbf{Splits.} For headroom: 20 weekdays evenly spaced over 2018 to 2021 per site. For learning: 50 evenly spaced weekdays split at random (fixed seed) into 30 for tuning and training and 20 for testing; and a chronological 2019 split with 30 weekdays from 1 January to 2 August for training and the 20 following weekdays (9 August to 31 December) for testing.
+
+%% =====================================================================
+\section{Experimental Setup}
+\textbf{Implementation.} Python with PyTorch 2.14 (float64 in the twin), NumPy, SciPy, CVXPY with Clarabel and OSQP. Versions are pinned and CPU runs are bit-exact; CUDA runs are not bitwise reproducible. All reported experiments in this paper were run on CPU.
+
+\textbf{Conformal experiments.} A load stream calibrated at $0.75\times$ nominal ($n=2000$) and deployed on a stream that ramps to $L\in\{1.0,1.25,1.5\}\times$ over 4000 steps, 20 seeds, $\alpha=0.05$, $\gamma=0.01$. Joint coverage is estimated on 2000 test scenarios for 32 branches at $\alpha=0.01$.
+
+\textbf{Headroom.} 20 weekdays per site, stress regime, three price sources; EDF caps on a grid down to 0.1 of rating; projected uncontrolled rule; LP oracle via CVXPY.
+
+\textbf{Learning.} Residual TD3: 3 seeds on real Caltech days, 120 episodes on synthetic days (one seed). Pathwise policy: 300 to 400 Adam iterations, learning rate $3\times10^{-3}$, gradient clip 5, 3 seeds per configuration. Evaluation on held-out days in the simulator, no constraint violations tolerated, paired bootstrap with 4000 resamples.
+
+\textbf{Verification of the twin.} Identical random actions through the twin and the simulator (10 synthetic and 10 real days); central finite differences on 60 non-zero-gradient coordinates.
+
+\textbf{World model.} Transitions from the simulator under four rules (EDF caps 1.0, 0.6, 0.4 and uncontrolled) on 30 training and 10 held-out synthetic days (2880 and 960 transitions), targets from the exact AC solve, 3 seeds, 1500 steps; margins calibrated on the first half of the held-out days and checked on the second half.
+
+\textbf{V2G.} Eight synthetic days at normal load, SCE stand-in price, efficiency 0.95 per direction with the same taper, a degradation term and the unmet penalty. All plans are executed in the simulator, so all costs are simulator costs.
+
+%% =====================================================================
+\section{Results}
+\subsection{Safety margins under load shift}\label{sec:conf}
+\textbf{Fixed margins fail.} A split-conformal margin calibrated at $0.75\times$ load covers 0.145, 0.081 and 0.064 of the whole deployment stream at $L=1.0,1.25,1.5$ (0.77, 0.62 and 0.51 over the first 500 steps, before the ramp finishes), against a target of 0.95. ACI holds 0.95 on the whole stream (Fig.~\ref{fig:conf}).
+\begin{figure}[h]\centering\includegraphics[width=.8\linewidth]{figs/fig_conformal_shift.pdf}\caption{Coverage under load shift (left; solid, whole stream; dashed, first 500 steps; dotted, target) and ACI margin relative to the fixed margin, with $(L/L_{\rm cal})^2$ for reference (right).}\label{fig:conf}\end{figure}
+
+\textbf{The margin growth is physical.} The steady ACI margin is 1.85, 3.02 and 4.59 times the fixed one, close to $(L/L_{\rm cal})^2=1.78,2.78,4.00$. LinDistFlow drops the $I^2R$ loss term, whose size grows with the square of current, so the error that the margin must cover grows with it. A load-normalised score (fitted exponent $k=2.11$) restores fixed-margin coverage at $L=1.0$ (0.953) but not at 1.25 or 1.5 (0.667, 0.287), and with ACI it lowers the margin by only 22 to 23\% (1.44, 2.35, 3.56 times the fixed margin). A scalar total load is a poor proxy for a quantity that depends on where load sits on the feeder: as hub rows saturate the injection pattern changes across buses, and branch current also rises as voltages fall. We did not test a per-bus feature.
+
+\textbf{Joint coverage needs a joint margin.} A single global margin on branch apparent power is 453 kVA at $\alpha=1\%$, above 10\% of the rating on 30 of 32 branches, which leaves weak branches with an empty safe set. Independent row-wise margins use at most 7.1\% of any rating and give per-branch coverage of at least 0.984, but joint coverage (all 32 rows at once) is 0.932 against 0.99. Bonferroni margins restore 0.990 (at most 8.5\% of a rating, median 2.6\%), and a rating-normalised maximum score with one quantile gives 0.988 (7.1\% of every rating). Using the global margin during learning raised cost from about 225 to 650 dollars per day after calibration, a cost of conservatism that is easy to mistake for training instability.
+
+\textbf{A structural remark.} On a tree, cutting branch $(i,j)$ couples the two sides only through $\xi=(v_i^2,P_{ij},Q_{ij})$, so consensus ADMM over subtrees gives an exact projection. It matched a monolithic solve (gap $10^{-7}$ to $10^{-5}$) but was not faster, and several 123-node and all 400-node many-block instances did not converge in 400 iterations. We therefore make no scalability claim.
+
+\subsection{Headroom on real days}\label{sec:head}
+Table~\ref{tab:head} gives $H$ for 20 stressed weekdays per site and three price sources, with violation-free references tuned on training days.
+\begin{table}[h]\centering\small
+\begin{tabular}{@{}lcccc@{}}\toprule & \multicolumn{2}{c}{Caltech} & \multicolumn{2}{c}{JPL}\\ Price source & $H$ (\%) & clairvoyant $H$ (\%) & $H$ (\%) & clairvoyant $H$ (\%)\\\midrule
+SCE TOU stand-in & 5.2 & 4.5 & 1.7 & 3.3\\
+CAISO hourly (WEP) & 7.7 & 6.4 & 4.1 & 4.5\\
+SCE TOU-EV-4 with demand charge & $-0.4^\dagger$ & 2.3 & $-7.4^\dagger$ & 2.8\\\bottomrule
+\end{tabular}\caption{Headroom on 20 real weekdays (stress). ``Clairvoyant'' uses the per-day best heuristic instead of the train-tuned one. $^\dagger$The LP solver reported reduced accuracy and the LP value is higher than the best heuristic; see the diagnosis below.}\label{tab:head}\end{table}
+Headroom is between 1.7 and 7.7\% when the LP is reliable. The best reference is an EDF cap at Caltech and the projected uncontrolled rule at JPL. Using an unprojected uncontrolled rule as reference, which violates the network on 60 to 75\% of stress days, inflates JPL headroom to 13 to 17\%; we therefore require references to be violation-free after projection (Fig.~\ref{fig:head}).
+\begin{figure}[h]\centering\includegraphics[width=.55\linewidth]{figs/fig_headroom_gating.pdf}\caption{Headroom (SCE stand-in, 20 real weekdays) under three admission rules for the reference.}\label{fig:head}\end{figure}
+\textbf{The LP is not a lower bound.} It omits the SoC-dependent efficiency, and a clairvoyant per-day choice among heuristics can be cheaper than it (rows marked $\dagger$). Section~\ref{sec:pp} gives a learned policy that is cheaper than the LP at JPL.
+
+\textbf{Sample size.} For paired daily differences with standard deviation $\sigma_\Delta$ and mean gain $\mu$, the normal-approximation test needs $N\gtrsim(z_{1-\delta/2}+z_\beta)^2\sigma_\Delta^2/\mu^2$ days. Since $\mu\le HJ_{\rm ref}$ under the LP model, $N$ grows at least as $H^{-2}$ at fixed $\sigma_\Delta$, so a few-percent headroom needs hundreds of days to resolve a gain, and a Hoeffding gate is far more conservative still. This is a planning heuristic, since $\sigma_\Delta$ depends on the policy.
+
+\subsection{Critic-based residual learning}\label{sec:rl}
+On real Caltech held-out days over three seeds, residual SafeTD3 costs $+6.3$, $+4.4$ and $+8.5\%$ relative to the tuned cap at residual scale 0.3 and $+1.8\%$ at 0.1; plain TD3 is $+41\%$. The regret grows with the permitted deviation, there are no violations, and lower exploration noise, tuned hyperparameters or removing the conformal margin do not change the sign. On the synthetic stress days of Sec.~\ref{sec:twin}, where headroom is 33\%, the same residual TD3 after 120 episodes (one seed) costs 1030 against 907 for the tuned cap (+13.6\%). A larger training budget could change this and we have not tried it.
+
+\subsection{The differentiable twin and pathwise learning}\label{sec:twin}
+\textbf{Fidelity.} For identical random actions the twin and the simulator agree to $3.5\times10^{-16}$ relative cost on 10 synthetic days and $2\times10^{-16}$ on 10 real days, with no violations. Autograd against central differences on 60 non-zero-gradient coordinates has median relative error $3\times10^{-7}$ (synthetic), $1.3\times10^{-4}$ (Caltech) and $1.7\times10^{-6}$ (JPL), with 77, 50 and 67\% of coordinates within $10^{-4}$; the remainder sit at max or clip kinks.
+
+\textbf{High headroom.} On synthetic stress days ($H=32.7\%$) the pathwise policy costs 779.7, 783.2 and 780.9 over three seeds against 906.7 for the tuned cap and 610.0 for the LP (Table~\ref{tab:twin}). That is 10 to 14\% below the reference with no violations, and it also beats the clairvoyant per-day best cap (834.7), closing about 42\% of the gap to the LP. Residual TD3 is at 1030.2 on the same days. Headroom and gradient access change together here, so we do not attribute the difference to either.
+\begin{table}[h]\centering\small
+\begin{tabular}{@{}L{2.2cm}cccL{3.9cm}c@{}}\toprule Days & Headroom & Tuned reference & Residual TD3 & Pathwise, 3 seeds & LP\\\midrule
+Synthetic stress & 32.7\% & 906.7 & 1030.2 & 779.7 / 783.2 / 780.9 (uniform); 815.2 / 820.0 / 817.0 (sens+STE) & 610.0\\
+Real Caltech & 6.2\% & 386.1 & see Sec.~\ref{sec:rl} & 386.7 / 386.5 / 418.8 (sens+STE) & 362.2\\
+Real JPL & 0.7\% & 754.5 & see Sec.~\ref{sec:rl} & 857.1 / 889.3 / 889.3 (uniform) & 748.9\\\bottomrule
+\end{tabular}\caption{Mean cost per day on 20 held-out days (30 training days, random split), restoration inside the twin as stated. Real-day runs use the SCE stand-in price. Headroom here is computed on the 20 held-out days and so differs from Table~\ref{tab:head}.}\label{tab:twin}\end{table}
+\begin{figure}[h]\centering\includegraphics[width=\linewidth]{figs/fig_diffenv_poc.pdf}\caption{Held-out mean cost; dots are individual seeds. ``Exact QP'' bars are the networks of Table~\ref{tab:pp} run live under the exact QP projection; the other pathwise bars use the twin's ray-scaling restoration and come from earlier runs with different seeds.}\label{fig:twin}\end{figure}
+
+\textbf{The projection price.}\label{sec:pp} At JPL the first pathwise runs were 10 to 18\% worse than the reference and served only 85 to 87\% of energy. To tell policy quality from restoration quality we ran the trained network live in the simulator under two projections, using the same 20 held-out days. Two checks validate this setup: the full-rate rule under the exact QP equals the tuned reference (754.5), and each network under ray scaling in the simulator reproduces its twin cost (847.9 against 848.1).
+\begin{table}[h]\centering\small
+\begin{tabular}{@{}L{5.4cm}cccc@{}}\toprule JPL & ray scaling & served & exact QP & served\\\midrule
+Full-rate rule (tuned reference under QP) & 889.3 & 0.855 & 754.5 & 0.921\\
+Pathwise, seed 0 & 847.9 & 0.868 & 700.3 & 0.924\\
+Pathwise, seeds 1 and 2 & 889.3 & 0.855 & 754.5 & 0.921\\
+Safe initial action, seed 0 & 889.3 & 0.855 & 754.5 & 0.921\\
+sens+STE with safe initial action, seeds 0 to 2 & 870.4 & 0.862 & 754.5 & 0.921\\\midrule
+Caltech (tuned cap 386.1), pathwise seeds 0, 1, 2 & 386.5, 385.4, 386.8 & 0.81 & 388.7, 386.7, 390.3 & 0.81\\\bottomrule
+\end{tabular}\caption{Cost per day, 20 held-out days, no violations in any run. The same actions cost different amounts under different projections.}\label{tab:pp}\end{table}
+Replacing the QP by ray scaling raises the reference rule's own cost at JPL by 17.9\%, so most of the earlier gap came from the restoration. Under the exact QP, seed 0 costs 700.3, which is 7.2\% below the reference (paired 95\% interval $-75$ to $-33$ dollars per day, better on 16 of 20 days) and below the LP value of 748.9. The other runs (two original seeds, one seed started inside the feasible set, three seeds with the sens+STE backward pass) stayed at the full-rate plateau, so one of seven runs escaped it. The plateau is consistent with the scale invariance described in Sec.~\ref{sec:twinmethod}, plus a saturated sigmoid; we regard this as the likely mechanism, not a proven one. At Caltech the projection makes no practical difference.
+
+\textbf{Chronological 2019 split.} Training on 30 weekdays from 1 January to 2 August 2019 and testing on 20 weekdays from 9 August to 31 December 2019 (three seeds, uniform restoration) gives Table~\ref{tab:chrono}.
+\begin{table}[h]\centering\small
+\begin{tabular}{@{}lccccc@{}}\toprule 2019 split & Headroom & Reference & LP & Pathwise, 3 seeds & Served\\\midrule
+Caltech & 5.0\% & 320.5 (cap 0.6) & 304.4 & 365.7 / 365.7 / 365.7 & 0.89\\
+JPL & $-0.7$\% & 969.1 (projected full rate) & 975.6 & 1195.0 / 1122.7 / 1121.8 & 0.78 to 0.81\\\bottomrule
+\end{tabular}\caption{Held-out cost per day on the chronological split; no constraint violations in any run.}\label{tab:chrono}\end{table}
+Pathwise is 14\% (Caltech) and 16 to 23\% (JPL) worse than the reference. At Caltech all three seeds are identical and equal to the full-rate rule: the training cost never left its initial plateau, so no learning took place. The random-split result that pathwise matches the reference (Table~\ref{tab:twin}) is therefore specific to a split on which the tuned cap was close to full rate. Headroom is similar across splits (5.0\% against 6.2\% at Caltech).
+
+\textbf{Planning versus learning.} With perfect foresight on the synthetic days, open-loop Adam on the twin reaches 795 (uniform) and 708 (sens+STE) against 610 for the LP, so plain gradient descent is a weak planner for this piecewise-linear problem; a causal learned policy (781) beats the 300-iteration planner (795). Why is open; one candidate is that the planner's subgradient concentrates on one peak step and one binding row.
+
+\subsection{Residual world model and the conformal margin}\label{sec:wm}
+Table~\ref{tab:wm} gives one-step errors on held-out synthetic days.
+\begin{table}[h]\centering\small
+\begin{tabular}{@{}lcccc@{}}\toprule Model & Voltage MAE & Voltage max error & Branch-$S$ MAE & SoC MAE\\\midrule
+$F_{\rm base}$ only & $2.1\times10^{-4}$ & $5.5\times10^{-3}$ & $6.4\times10^{-3}$ & 0.024\\
+$+N_\theta$, 100 samples & $2.7\times10^{-4}$ & $6.0\times10^{-3}$ & $3.0\times10^{-3}$ & 0.031\\
+$+N_\theta$, 2880 samples & $1.8\times10^{-4}$ & $2.0\times10^{-3}$ & $2.1\times10^{-3}$ & 0.048\\
+Black-box, 100 samples & $1.5\times10^{-2}$ & 0.16 & 0.046 & 0.14\\
+Black-box, 2880 samples & $1.6\times10^{-2}$ & 0.20 & 0.045 & 0.083\\\bottomrule
+\end{tabular}\caption{One-step prediction error (p.u. except SoC), mean of 3 seeds; $F_{\rm base}$ is deterministic.}\label{tab:wm}\end{table}
+Without the physics base the network is about 70 times worse in voltage at every sample size, so the analytic model carries most of the accuracy. The residual halves the branch-flow error and cuts the voltage maximum by a factor of 2.8 once it has about a thousand transitions, but the mean voltage error improves by only 15\%.
+
+\textbf{The SoC error is a boundary effect.} The headline SoC error of $F_{\rm base}$ (0.024) comes entirely from the 3\% of occupied slots that change occupant within the step; on slots that stay occupied it is $1.1\times10^{-4}$. The residual's SoC head, trained on those boundary steps, raises the continuous-slot error to 0.025. Removing the head restores $1.1\times10^{-4}$, and a per-slot shared network for $\Delta$SoC adds nothing because $F_{\rm base}$ is already near exact there. We therefore apply $N_\theta$ to voltage and flow only.
+
+\textbf{Margins.} Table~\ref{tab:wm2} shows the margin that would be required, using the first half of the held-out days for calibration and the second half for coverage.
+\begin{table}[h]\centering\small
+\begin{tabular}{@{}lcccc@{}}\toprule Model & $\tau_v$ (5\%) & $\tau_v$ (1\%) & $\tau_S$ (1\%, relative to rating) & Coverage (v, S)\\\midrule
+$F_{\rm base}$ only & $1.95\times10^{-3}$ & $2.97\times10^{-3}$ & $1.52\times10^{-2}$ & 0.983, 0.985\\
+$+N_\theta$ with SoC head & $1.29\times10^{-3}$ & $1.41\times10^{-3}$ & $9.5\times10^{-3}$ & 0.956, 0.986\\
+$+N_\theta$ grid only & $1.13\times10^{-3}$ & $1.14\times10^{-3}$ & $1.6\times10^{-3}$ & 0.989, 0.991\\
+Black-box & $8.3\times10^{-2}$ & $1.1\times10^{-1}$ & $1.6\times10^{-1}$ & 0.968, 0.995\\\bottomrule
+\end{tabular}\caption{Required one-step safety margins (p.u.) at the 5\% and 1\% levels and test-half coverage at 1\%. Synthetic days, 3 seeds.}\label{tab:wm2}\end{table}
+The grid-only residual reduces the 1\% voltage margin 2.6 times and the rating-normalised branch margin 9.8 times at roughly the 0.99 target coverage. The tail drives this, not the mean. The effect of the smaller margin on dispatch cost, and the result on real transitions, are outside what we have measured.
+
+\subsection{Bidirectional V2G}\label{sec:v2g}
+We checked what discharge would add on eight synthetic days (efficiency 0.95 per direction with taper, about 0.90 round trip, degradation and the unmet penalty). The hindsight LP with discharge is cheaper than without by \$57.2 per day on average (15.4\%), positive on all eight days (\$19 to \$88). The causal rule \texttt{v2g\_greedy} is 16.0\% more expensive than the non-discharging time-of-use rule. Discharge is therefore valuable to a clairvoyant planner and harmful to a naive causal one, which is the pattern of a high-headroom regime. A collaborator's earlier four-arm study with a synthetic CAISO-like price reported an oracle gain of at most \$0.9 per day; we could not reproduce that under our price and battery assumptions. We did not train a policy for the bidirectional case.
+
+%% =====================================================================
+\section{Discussion and Limitations}
+The safety results are the most solid. The network is balanced and single-phase and the AC reference shares the model, so unbalance is not tested; there is one feeder and two sites; and the chronological split covers a single year. Real-day headroom is small and the LP is unreliable under the tariff source (reduced solver accuracy, and the LP lacks the efficiency curve), so real-day learning results should be read as pilot results. The critic baseline had one training budget, and the TD3 comparison on synthetic days has one seed. The world-model result is one-step and on synthetic days. Federated averaging showed no benefit over local tuning in a two-site pilot and is not reported as a result. We observed no constraint violations in any evaluated run, which is not a guarantee: the conformal statements hold under their stated assumptions and for a single step.
+
+\section{Conclusion}
+A learned policy is only as impressive as the headroom it has to work with. On real Caltech and JPL days that headroom, measured against a tuned, violation-free reference, is a few percent, and neither a critic-based residual agent nor pathwise learning through a verified twin reliably captured it. Where headroom is large (33\% on synthetic stress days), pathwise learning gained 10 to 14\%. On the safety side, a fixed margin does not survive load shift, adaptive conformal inference does, the margin it needs grows with the square of load for a physical reason, and one joint margin is needed for joint coverage. The restoration operator inside a differentiable twin can decide whether learning happens at all, and a physics-based world model with a learned grid residual lowers the margin that safety requires. The next steps are a restoration that is not scale-invariant, training on a regime with large headroom such as bidirectional V2G, evaluating the margin reduction on real transitions and on dispatch cost, and testing on an unbalanced three-phase model.
+
+\paragraph{Reproducibility.} Code, result files and a SHA-256 manifest accompany this paper (\texttt{REPRODUCE.md}); versions are pinned and tests cover twin fidelity, gradients, the QP layer and the conformal procedures. Figures are generated from the stored result files.
+
+%% =====================================================================
+\section*{References, with what each work does, what it does not do, and how we use it}
+\small
+\begin{thebibliography}{99}\setlength{\itemsep}{4pt}
+\bibitem{ev2gym}\textbf{S. Orfanoudakis, C. Diaz-Londono, Y. E. Yilmaz, P. Palensky, P. P. Vergara, ``EV2Gym: A flexible V2G simulator for EV smart charging research and benchmarking,'' IEEE Trans. Intell. Transp. Syst., 26(2):2410--2421, 2025.} \emph{Does:} an open V2G simulator with real data, heuristics, MPC and RL baselines; finds MPC best on the profit and satisfaction balance. \emph{Does not:} model the distribution network, so voltage and branch limits do not appear. \emph{Our use:} motivates a feeder-aware environment and the point that tuned classical control is hard to beat.
+\bibitem{pitd3}\textbf{S. Orfanoudakis, F. A. Oliehoek, P. Palensky, P. P. Vergara, ``Physics-informed reinforcement learning for large-scale EV smart charging considering distribution network voltage constraints,'' arXiv:2510.12335.} \emph{Does:} trains an actor by backpropagating through $K$-step rollouts of a known power-flow and SoC model on 34- and 123-bus feeders and compares it with TD3, SAC, PPO and an oracle MPC. \emph{Does not:} report a perfect-foresight bound against a train-tuned violation-free heuristic on real sessions, analyse the restoration operator, or calibrate the model error. \emph{Our use:} the same pathwise principle is not claimed as new; we add the headroom gate, the restoration analysis and calibration.
+\bibitem{tlmappo}\textbf{C. Huang, J. Fan, W. Wang, H. Wang, ``Safe decentralized operation of EV virtual power plant with limited network visibility via multi-agent reinforcement learning,'' arXiv:2604.03278.} \emph{Does:} Lagrangian multi-agent RL on a 33-bus feeder with a few charging stations. \emph{Does not:} give per-step safety or compare with a tuned heuristic. \emph{Our use:} the expectation-level alternative to a projection layer.
+\bibitem{ruddick}\textbf{J. Ruddick, G. Ceusters, G. Van Kriekinge, E. Genov, C. De Cauwer, T. Coosemans, M. Messagie, ``Real-world validation of safe reinforcement learning, model predictive control and decision tree-based home energy management systems,'' arXiv:2408.07435.} \emph{Does:} a field comparison in which rule-based, MPC and tree policies were within 0.6\% and RL was 25\% worse. \emph{Does not:} study network constraints. \emph{Our use:} independent evidence that a tuned classical baseline is hard to beat.
+\bibitem{acn}\textbf{Z. J. Lee, T. Li, S. H. Low, ``ACN-Data: Analysis and applications of an open EV charging dataset,'' ACM e-Energy, 2019.} \emph{Does:} releases session logs from Caltech, JPL and other sites. \emph{Does not:} include network models or tariffs for every site. \emph{Our use:} all real sessions.
+\bibitem{acnsim}\textbf{Z. J. Lee, D. Johansson, S. H. Low, ``ACN-Sim: An open-source simulator for data-driven electric vehicle charging research,'' IEEE SmartGridComm, 2019.} \emph{Does:} replays sessions through scheduling algorithms with infrastructure constraints. \emph{Does not:} provide a learning framework or AC feeder constraints. \emph{Our use:} source of the \texttt{acnportal} tariff schedule and of the session format.
+\bibitem{wep}\textbf{D. Millstein, E. O'Shaughnessy, R. Wiser, Wholesale Electricity Prices (WEP) tool, Lawrence Berkeley National Laboratory.} \emph{Does:} provides hourly wholesale price series. \emph{Does not:} give nodal prices for a specific bus. \emph{Our use:} the CAISO hourly series as one of the price sources.
+\bibitem{baranwu}\textbf{M. E. Baran, F. F. Wu, ``Network reconfiguration in distribution systems for loss reduction and load balancing,'' IEEE Trans. Power Delivery, 4(2):1401--1407, 1989.} \emph{Does:} defines the 33-bus test feeder and the radial power-flow formulation used with it. \emph{Our use:} the feeder.
+\bibitem{farivar}\textbf{M. Farivar, S. H. Low, ``Branch flow model: Relaxations and convexification,'' IEEE Trans. Power Systems, 28(3):2554--2572, 2013.} \emph{Does:} formalises the branch-flow equations on trees and their convex relaxations. \emph{Does not:} address EV control or learning. \emph{Our use:} the exact model behind our ``AC'' reference and the notation for LinDistFlow.
+\bibitem{optnet}\textbf{B. Amos, J. Z. Kolter, ``OptNet: Differentiable optimization as a layer in neural networks,'' ICML 2017.} \emph{Does:} differentiates through QP solutions. \emph{Our use:} the idea of a QP layer in a policy.
+\bibitem{cvxpylayers}\textbf{A. Agrawal, B. Amos, S. Barratt, S. Boyd, S. Diamond, J. Z. Kolter, ``Differentiable convex optimization layers,'' NeurIPS 2019.} \emph{Does:} a general tool for differentiable convex layers. \emph{Our use:} the implementation route for the safety layer.
+\bibitem{dalal}\textbf{G. Dalal, K. Dvijotham, M. Vecerik, T. Hester, C. Paduraru, Y. Tassa, ``Safe exploration in continuous action spaces,'' arXiv:1801.08757, 2018.} \emph{Does:} a safety layer that corrects actions for a learned linear constraint model. \emph{Does not:} calibrate the model error against an exact solution under shift. \emph{Our use:} the action-correction principle.
+\bibitem{wabersich}\textbf{K. P. Wabersich, M. N. Zeilinger, ``A predictive safety filter for learning-based control of constrained nonlinear dynamical systems,'' Automatica, 129, 2021.} \emph{Does:} a model-based filter with recursive-feasibility guarantees. \emph{Does not:} treat a distribution network. \emph{Our use:} context for safety filters; ours is one-step.
+\bibitem{garcia}\textbf{J. Garc\'ia, F. Fern\'andez, ``A comprehensive survey on safe reinforcement learning,'' J. Mach. Learn. Res., 16:1437--1480, 2015.} \emph{Our use:} taxonomy of safe RL.
+\bibitem{achiam}\textbf{J. Achiam, D. Held, A. Tamar, P. Abbeel, ``Constrained policy optimization,'' ICML 2017.} \emph{Does:} constraint satisfaction in expectation during training. \emph{Our use:} the contrast with per-step projection.
+\bibitem{td3}\textbf{S. Fujimoto, H. van Hoof, D. Meger, ``Addressing function approximation error in actor-critic methods,'' ICML 2018.} \emph{Our use:} the critic-based baseline (TD3).
+\bibitem{johannink}\textbf{T. Johannink et al., ``Residual reinforcement learning for robot control,'' IEEE ICRA, 2019.} \emph{Does:} learns a correction on top of a hand-designed controller. \emph{Our use:} the residual form of the critic baseline.
+\bibitem{silverres}\textbf{T. Silver, K. Allen, J. Tenenbaum, L. Kaelbling, ``Residual policy learning,'' arXiv:1812.06298, 2018.} \emph{Our use:} same principle as \cite{johannink}.
+\bibitem{ng}\textbf{A. Y. Ng, D. Harada, S. Russell, ``Policy invariance under reward transformations: Theory and application to reward shaping,'' ICML 1999.} \emph{Our use:} potential-based shaping that does not change optimal policies.
+\bibitem{vovk}\textbf{V. Vovk, A. Gammerman, G. Shafer, \emph{Algorithmic Learning in a Random World}, Springer, 2005.} \emph{Does:} the theory of conformal prediction under exchangeability. \emph{Our use:} split-conformal quantiles.
+\bibitem{lei}\textbf{J. Lei, M. G'Sell, A. Rinaldo, R. J. Tibshirani, L. Wasserman, ``Distribution-free predictive inference for regression,'' J. Am. Stat. Assoc., 113(523), 2018.} \emph{Our use:} split-conformal procedure and finite-sample guarantee.
+\bibitem{angelopoulos}\textbf{A. N. Angelopoulos, S. Bates, ``Conformal prediction: A gentle introduction,'' Found. Trends Mach. Learn., 16(4), 2023.} \emph{Our use:} reference for the procedure.
+\bibitem{aci}\textbf{I. Gibbs, E. J. Cand\`es, ``Adaptive conformal inference under distribution shift,'' NeurIPS 2021.} \emph{Does:} online level adaptation for long-run coverage under shift. \emph{Does not:} treat constraint projection or joint coverage over many rows. \emph{Our use:} the load-shift calibration, with the finding that the margin growth is physical.
+\bibitem{acofi}\textbf{S. Huriot, I. Tabbara, H. Sibai, ``Safe control using learned safety filters and adaptive conformal inference,'' arXiv:2604.18482.} \emph{Does:} sets switching thresholds for learned safety filters with ACI. \emph{Does not:} calibrate a power-flow linearisation. \emph{Our use:} nearest use of ACI in safe control.
+\bibitem{zapico}\textbf{D. Fern\'andez-Zapico, T. Hofman, M. Salazar, ``Stochastic model predictive control of charging energy hubs with conformal prediction,'' arXiv:2504.00685.} \emph{Does:} conformal forecast intervals inside stochastic MPC, about 0.8\% cost gain. \emph{Does not:} calibrate network-model error. \emph{Our use:} comparison for conformal methods in charging.
+\bibitem{heess}\textbf{N. Heess, G. Wayne, D. Silver, T. Lillicrap, T. Erez, Y. Tassa, ``Learning continuous control policies by stochastic value gradients,'' NeurIPS 2015.} \emph{Our use:} pathwise gradients through a model.
+\bibitem{shac}\textbf{J. Xu, V. Makoviychuk, Y. Narang, F. Ramos, W. Matusik, A. Garg, M. Macklin, ``Accelerated policy learning with parallel differentiable simulation,'' ICLR 2022 (arXiv:2204.07137).} \emph{Does:} short-horizon actor-critic with analytic gradients from a differentiable simulator. \emph{Does not:} address feasibility restoration with a linearised constraint set. \emph{Our use:} the pathwise recipe.
+\bibitem{suh}\textbf{H. J. T. Suh, M. Simchowitz, K. Zhang, R. Tedrake, ``Do differentiable simulators give better policy gradients?'' ICML 2022.} \emph{Does:} shows that stiffness and discontinuity can make pathwise gradients biased or high variance. \emph{Our use:} the framing for our restoration finding.
+\bibitem{metz}\textbf{L. Metz, C. D. Freeman, S. S. Schoenholz, T. Kachman, ``Gradients are not all you need,'' arXiv:2111.05803, 2021.} \emph{Our use:} a general warning on gradient pathologies through long unrolls.
+\bibitem{brax}\textbf{C. D. Freeman et al., ``Brax: A differentiable physics engine for large scale rigid body simulation,'' NeurIPS Datasets and Benchmarks, 2021.} \emph{Our use:} example of differentiable simulation for learning.
+\bibitem{difftaichi}\textbf{Y. Hu et al., ``DiffTaichi: Differentiable programming for physical simulation,'' ICLR 2020.} \emph{Our use:} example of differentiable simulation for learning.
+\bibitem{dpf}\textbf{M. \"Oz, J. H\"orter, K. Phipps, C. Debus, A. Streit, M. G\"otz, ``Differentiable power-flow optimization,'' arXiv:2603.28203.} \emph{Does:} differentiable AC power flow for speed and batching. \emph{Does not:} study control with safety margins. \emph{Our use:} context.
+\bibitem{distev}\textbf{A. Ghavami, K. Kar, A. Gupta, ``Decentralized charging of plug-in electric vehicles with distribution feeder overload control,'' arXiv:1308.4316.} \emph{Does:} decentralised charging protocols with feeder limits. \emph{Our use:} context for the radial decomposition remark.
+\bibitem{boyd}\textbf{S. Boyd, N. Parikh, E. Chu, B. Peleato, J. Eckstein, ``Distributed optimization and statistical learning via the alternating direction method of multipliers,'' Found. Trends Mach. Learn., 3(1), 2011.} \emph{Our use:} the consensus-ADMM projection tested on the tree cuts.
+\bibitem{henderson}\textbf{P. Henderson, R. Islam, P. Bachman, J. Pineau, D. Precup, D. Meger, ``Deep reinforcement learning that matters,'' AAAI 2018.} \emph{Our use:} motivation for multiple seeds and paired comparison.
+\bibitem{agarwal}\textbf{R. Agarwal, M. Schwarzer, P. S. Castro, A. Courville, M. G. Bellemare, ``Deep reinforcement learning at the edge of the statistical precipice,'' NeurIPS 2021.} \emph{Our use:} interval estimates and bootstrap-based comparison.
+\bibitem{vazquez}\textbf{J. R. V\'azquez-Canteli, Z. Nagy, ``Reinforcement learning for demand response: A review of algorithms and modeling techniques,'' Applied Energy, 235:1072--1089, 2019.} \emph{Our use:} background on RL for demand response.
+\end{thebibliography}
+\end{document}

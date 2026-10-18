@@ -1,0 +1,46 @@
+
+\emph{(Run: 60 central episodes on Caltech train days, seed 0, residual scale $0.1$ around the Caltech-tuned cap; JPL evaluated zero-shot on its 8 val+test days, none seen in training. Costs in \$/day, mean over days; ``viol'' of raw rules is the AC thermal overload in p.u.; evidence \texttt{docs/study/transfer\_*.json}.)}
+
+\begin{center}\small
+\begin{tabular}{@{}llrrrr@{}}
+\toprule Regime & Policy & Caltech test & JPL (SCE stand-in) & JPL (CAISO-like synth.) & JPL served\\\midrule
+\multirow{5}{*}{normal} & safe-uncontrolled (QP only) & 332.9 & 858.7 & 732.2 & 85.5\%\\
+ & EDF cap, Caltech-tuned (0.45) & 297.1 & 1155.4 & 1045.1 & 75.2\%\\
+ & EDF cap, JPL-tuned (1.0, raw) & --- & 823.8 & 694.1 & 86.5\%\\
+ & residual SafeTD3 (last) & 299.7 & 1155.0 & 1044.7 & 74.9\%\\
+ & oracle LP & 276.6 & 807.5 & 674.8 & 84.9\%\\\midrule
+\multirow{5}{*}{stress} & safe-uncontrolled (QP only) & 313.3 & 769.9 & 634.8 & 91.4\%\\
+ & EDF cap, Caltech-tuned (0.6) & 266.1 & 1114.7 & 997.4 & 80.1\%\\
+ & EDF cap, JPL-tuned (1.0, raw) & --- & 795.4 & 650.0 & 91.2\%\\
+ & residual SafeTD3 (last) & 270.9 & 1048.0 & 924.4 & 82.2\%\\
+ & oracle LP & 246.1 & 800.1 & 661.6 & 87.8\%\\
+\bottomrule\end{tabular}\end{center}
+\noindent\textbf{What it says (honest reading).}
+\begin{enumerate}[label=(\alph*)]
+\item \emph{In-domain} (Caltech test) the residual learner is within $0.9\%$ (normal) and $1.8\%$ (stress) of the tuned EDF --- close, not better.
+\item \emph{A tuned heuristic does not transfer.} The best cap is $0.45$--$0.6$ at Caltech but $1.0$ (no cap) at JPL (195~kW capacity, different session mix): the Caltech cap costs JPL $+35$ to $+45\%$ versus plain charging through the safety layer.
+\item \emph{The residual inherits its base's failure.} Because the executed action is within a $\beta$-ball of the base (Prop.~\ref{p3}), a mis-specified base is a ceiling on robustness. The residual does improve on its own bad base zero-shot ($-6$ to $-7\%$ in the stressed regime, $0\%$ in the normal one) but remains far from the tuning-free baseline.
+\item \emph{The tuning-free QP wrapper is the robust choice:} safe-uncontrolled is within $6\%$ of the oracle at JPL (normal) and \emph{below} the (imperfect, margin-tightened) oracle in the stressed CAISO-like arm; the raw JPL-tuned rule reaches the same cost but violates the feeder ($0.03$--$0.15$ p.u.).
+\item \emph{Price shift (SCE stand-in $\to$ synthetic CAISO-like) changes levels, not orderings}: the ranking of policies is the same under both tariffs (a weak but useful robustness check; real CAISO data still needed).
+\end{enumerate}
+\textbf{Design consequence:} the base must be tuned \emph{per site} (locally, no data sharing) and the headroom gate must be evaluated per site: JPL has $\approx0\%$ headroom over the safety-wrapped plain charger, so nothing should be learned or federated there.
+
+\paragraph{Federated Caltech + JPL (pilot: 8 rounds $\times$ 2 local episodes, seed 0).} Each client tunes its own EDF cap on its own train days
+(Caltech $0.45$ / $0.6$, JPL $1.0$: normal / stress) and trains a residual (scale $0.1$) around it; FedProx ($\mu=0.05$) aggregates only the shared trunk.
+Held-out test days per site (4 each); \$/day:
+\begin{center}\small\begin{tabular}{@{}llrrrrr@{}}
+\toprule Regime & Site & local EDF & safe-uncontr. & FedProx & Local-only & Oracle\\\midrule
+normal & Caltech & 297.1 & 332.9 & 299.5 & 299.2 & 276.6\\
+normal & JPL & 765.8 & 789.8 & 776.1 & 772.3 & 734.8\\
+stress & Caltech & 266.1 & 313.2 & 273.2 & 272.7 & 246.1\\
+stress & JPL & 794.7 & 687.5 & 768.6 & 769.7 & 684.1\\
+\bottomrule\end{tabular}\end{center}
+\noindent\textbf{Honest reading.} (a) FedProx $\approx$ local-only to within $\pm0.5\%$: \emph{no federation benefit is measurable at this scale}; the
+pilot has 16 episodes per client and one seed. (b) Both are $0.8$--$2.7\%$ above the local EDF at Caltech (as in the central runs), and $-3\%$ to $+1.3\%$
+versus the local EDF at JPL; at JPL under stress the (locally tuned) EDF base is itself $16\%$ worse than the tuning-free safe-uncontrolled rule ($794.7$ vs $687.5$), so the right
+JPL controller is the QP-wrapped plain charger and the gate (Prop.~\ref{p4}) should refuse the residual. (c) The shared trunk drift after FedProx aggregation is $0$ by
+construction (clients are synchronised after each round); local-only drift is $\approx45$, i.e.\ the trunks do diverge without aggregation, but divergence alone did not change test cost.
+(d) All runs: zero violations through the safety layer. \textbf{Claim we can make today:} federated training is \emph{feasible and safe} across two real,
+heterogeneous sites with locally tuned bases and without sharing sessions; \textbf{claim we cannot make:} that it improves cost. That needs $\ge5$ seeds, $\ge100$ rounds, and
+a third site.
+
