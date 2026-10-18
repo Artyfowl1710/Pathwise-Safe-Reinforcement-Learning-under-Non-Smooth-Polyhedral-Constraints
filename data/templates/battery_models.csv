@@ -1,0 +1,6 @@
+model,capacity_kwh,weight
+Nissan Leaf,40,0.25
+Tesla Model 3 SR,60,0.30
+Chevy Bolt,66,0.15
+Tesla Model 3 LR,75,0.20
+Other,50,0.10

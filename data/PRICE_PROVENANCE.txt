@@ -1,0 +1,2 @@
+tariff_*.csv: SCE TOU-EV-4 Mar-2019 schedule from acnportal, applied to 2018-2021 and both sites (assumption).
+caiso_sp15_lmp.csv: LBNL WEP tool CAISO hourly 2018-2021 (Millstein, O'Shaughnessy, Wiser 2026); NOT the SP15 node.
