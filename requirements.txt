@@ -1,0 +1,15 @@
+# Core
+torch>=2.1
+numpy>=1.24
+scipy>=1.10
+
+# Safety-layer cross-validation only (not needed for the main training loop)
+cvxpy>=1.4
+osqp>=0.6
+
+# Plotting / reporting
+matplotlib>=3.7
+pandas>=2.0
+
+# Testing
+pytest>=7.4
