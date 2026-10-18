@@ -1,0 +1,53 @@
+[single] started. Screen shows important messages only; full log: logs/study/C/single_20261011_135638.log
+
+[single] REAL DATA: site=caltech date=2019-10-18 k_max=54 (real EVSE count) episodes=40 device=cpu
+  ep   0 | ret    28.22 | cost   806.23 | Vmin 0.9758 | viol 0.00e+00 | unmet 741.38 | wm_v_mae 1.95e-04
+  ep   1 | ret    30.23 | cost   786.12 | Vmin 0.9785 | viol 0.00e+00 | unmet 712.83 | wm_v_mae 1.41e-04
+  ep   2 | ret    26.67 | cost   821.72 | Vmin 0.9853 | viol 0.00e+00 | unmet 753.62 | wm_v_mae 1.47e-04
+  ep   3 | ret    29.65 | cost   791.97 | Vmin 0.9844 | viol 0.00e+00 | unmet 724.12 | wm_v_mae 1.55e-04
+  ep   4 | ret    27.77 | cost   810.69 | Vmin 0.9821 | viol 0.00e+00 | unmet 743.61 | wm_v_mae 1.35e-04
+  ep   5 | ret    29.94 | cost   789.09 | Vmin 0.9881 | viol 0.00e+00 | unmet 716.25 | wm_v_mae 2.30e-04
+  ep   6 | ret    28.35 | cost   804.97 | Vmin 0.9784 | viol 0.00e+00 | unmet 738.65 | wm_v_mae 1.49e-04
+  ep   7 | ret    32.58 | cost   762.67 | Vmin 0.9787 | viol 0.00e+00 | unmet 681.03 | wm_v_mae 2.26e-04
+  ep   8 | ret    28.32 | cost   805.20 | Vmin 0.9719 | viol 0.00e+00 | unmet 751.14 | wm_v_mae 1.26e-04
+  ep   9 | ret    78.82 | cost   300.20 | Vmin 0.9762 | viol 0.00e+00 | unmet 166.86 | wm_v_mae 2.78e-04
+  ep  10 | ret    78.62 | cost   302.27 | Vmin 0.9814 | viol 0.00e+00 | unmet 169.76 | wm_v_mae 2.38e-04
+  ep  11 | ret    59.08 | cost   497.60 | Vmin 0.9752 | viol 0.00e+00 | unmet 383.40 | wm_v_mae 1.78e-04
+  ep  12 | ret    59.89 | cost   489.52 | Vmin 0.9769 | viol 0.00e+00 | unmet 372.47 | wm_v_mae 1.50e-04
+  ep  13 | ret    70.02 | cost   388.27 | Vmin 0.9854 | viol 0.00e+00 | unmet 258.94 | wm_v_mae 1.39e-04
+  ep  14 | ret    63.35 | cost   454.97 | Vmin 0.9824 | viol 0.00e+00 | unmet 333.09 | wm_v_mae 1.21e-04
+  ep  15 | ret    65.75 | cost   430.97 | Vmin 0.9836 | viol 0.00e+00 | unmet 305.54 | wm_v_mae 1.48e-04
+  ep  16 | ret    72.13 | cost   367.18 | Vmin 0.9767 | viol 0.00e+00 | unmet 237.03 | wm_v_mae 1.84e-04
+  ep  17 | ret    77.68 | cost   311.64 | Vmin 0.9895 | viol 0.00e+00 | unmet 180.13 | wm_v_mae 1.41e-04
+  ep  18 | ret    75.50 | cost   333.46 | Vmin 0.9808 | viol 0.00e+00 | unmet 203.85 | wm_v_mae 1.53e-04
+  ep  19 | ret    72.30 | cost   365.40 | Vmin 0.9777 | viol 0.00e+00 | unmet 235.30 | wm_v_mae 2.00e-04
+  ep  20 | ret    76.37 | cost   324.76 | Vmin 0.9847 | viol 0.00e+00 | unmet 194.81 | wm_v_mae 1.21e-04
+  ep  21 | ret    77.78 | cost   310.62 | Vmin 0.9795 | viol 0.00e+00 | unmet 179.78 | wm_v_mae 2.44e-04
+  ep  22 | ret    78.58 | cost   302.61 | Vmin 0.9839 | viol 0.00e+00 | unmet 170.33 | wm_v_mae 2.46e-04
+  ep  23 | ret    78.26 | cost   305.83 | Vmin 0.9782 | viol 0.00e+00 | unmet 174.11 | wm_v_mae 1.58e-04
+  ep  24 | ret    77.15 | cost   316.94 | Vmin 0.9745 | viol 0.00e+00 | unmet 186.36 | wm_v_mae 1.05e-04
+  ep  25 | ret    78.22 | cost   306.23 | Vmin 0.9836 | viol 0.00e+00 | unmet 174.86 | wm_v_mae 1.28e-04
+  ep  26 | ret    77.35 | cost   314.92 | Vmin 0.9779 | viol 0.00e+00 | unmet 184.26 | wm_v_mae 1.14e-04
+  ep  27 | ret    77.60 | cost   312.41 | Vmin 0.9835 | viol 0.00e+00 | unmet 181.71 | wm_v_mae 1.20e-04
+  ep  28 | ret    76.95 | cost   318.94 | Vmin 0.9757 | viol 0.00e+00 | unmet 189.32 | wm_v_mae 1.75e-04
+  ep  29 | ret    78.35 | cost   304.89 | Vmin 0.9870 | viol 0.00e+00 | unmet 174.02 | wm_v_mae 1.19e-04
+  ep  30 | ret    77.14 | cost   317.03 | Vmin 0.9786 | viol 0.00e+00 | unmet 187.76 | wm_v_mae 1.26e-04
+  ep  31 | ret    77.72 | cost   311.25 | Vmin 0.9895 | viol 0.00e+00 | unmet 181.20 | wm_v_mae 1.49e-04
+  ep  32 | ret    74.13 | cost   347.11 | Vmin 0.9828 | viol 0.00e+00 | unmet 222.94 | wm_v_mae 1.39e-04
+  ep  33 | ret    73.69 | cost   351.51 | Vmin 0.9781 | viol 0.00e+00 | unmet 227.01 | wm_v_mae 1.88e-04
+  ep  34 | ret    73.99 | cost   348.56 | Vmin 0.9808 | viol 0.00e+00 | unmet 223.68 | wm_v_mae 1.43e-04
+  ep  35 | ret    72.86 | cost   359.83 | Vmin 0.9780 | viol 0.00e+00 | unmet 236.00 | wm_v_mae 1.06e-04
+  ep  36 | ret    73.78 | cost   350.68 | Vmin 0.9821 | viol 0.00e+00 | unmet 225.65 | wm_v_mae 8.87e-05
+  ep  37 | ret    74.74 | cost   341.02 | Vmin 0.9897 | viol 0.00e+00 | unmet 215.33 | wm_v_mae 1.90e-04
+  ep  38 | ret    72.73 | cost   361.11 | Vmin 0.9862 | viol 0.00e+00 | unmet 239.85 | wm_v_mae 1.97e-04
+  ep  39 | ret    70.63 | cost   382.10 | Vmin 0.9741 | viol 0.00e+00 | unmet 261.66 | wm_v_mae 9.16e-05
+  wall time: 1744.4s
+    uncontrolled     cost    279.44 served  86.6% viol 8.862e-03 Vmin 0.9835
+    tou_greedy       cost    279.46 served  86.6% viol 8.862e-03 Vmin 0.9835
+    v2g_greedy       cost    288.56 served  86.1% viol 8.901e-03 Vmin 0.9837
+    safe_v2g_greedy  cost    313.02 served  83.6% viol 0.000e+00 Vmin 0.9833
+    SafeTD3 last (fresh seeds) cost    359.59 served  78.2% viol 0.000e+00 qp_mod 33% qp_cut 9%
+    SafeTD3 best (fresh seeds) cost    313.68 served  83.2% viol 0.000e+00  [ep 9] qp_mod 38% qp_cut 13%
+    SafeTD3 (ours)   cost    350.64 served  79.1% viol 0.000e+00 Vmin 0.9847
+  wrote results/study/C/single_real_caltech_2019-10-18_seed0.json
+[single] finished in 1757s. Log: logs/study/C/single_20261011_135638.log

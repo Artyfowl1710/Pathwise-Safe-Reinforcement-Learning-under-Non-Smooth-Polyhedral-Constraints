@@ -1,0 +1,37 @@
+{
+  "uncontrolled": {
+    "total_cost": 194.0958976446255,
+    "served_frac": 0.9495566116163285,
+    "v_viol": 0.0,
+    "s_viol": 0.291651883665822,
+    "cost_unmet": 54.904702539100164
+  },
+  "tou_greedy": {
+    "total_cost": 194.79162934917406,
+    "served_frac": 0.9483169460747817,
+    "v_viol": 0.0,
+    "s_viol": 0.2916518662614454,
+    "cost_unmet": 56.25400658047232
+  },
+  "safe_v2g_greedy": {
+    "total_cost": 245.92584683880278,
+    "served_frac": 0.9022549946361973,
+    "v_viol": 0.0,
+    "s_viol": 0.0,
+    "cost_unmet": 106.38976912818808
+  },
+  "oracle_lp (margin 2mV/20kVA)": {
+    "total_cost": 219.6223454185797,
+    "served_frac": 0.9308553021661421,
+    "v_viol": 0.0,
+    "s_viol": 0.0,
+    "cost_unmet": 75.25999319968007
+  },
+  "oracle_lp (margin 0.5mV/3kVA)": {
+    "total_cost": 209.1783844991227,
+    "served_frac": 0.9317991713327581,
+    "v_viol": 0.0,
+    "s_viol": 0.0,
+    "cost_unmet": 74.23264635623016
+  }
+}

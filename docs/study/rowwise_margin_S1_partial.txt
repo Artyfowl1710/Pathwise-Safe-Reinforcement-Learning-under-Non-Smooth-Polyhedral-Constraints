@@ -1,0 +1,15 @@
+[single] started. Screen shows important messages only; full log: logs/study2/S1/single_20261011_181232.log
+
+[single] REAL DATA: site=caltech date=2019-10-18 k_max=54 (real EVSE count) episodes=40 device=cpu
+  ep   0 | ret    33.84 | cost   750.03 | Vmin 0.9759 | viol 0.00e+00 | unmet 655.76 | wm_v_mae 1.90e-04
+  ep   1 | ret    40.25 | cost   685.90 | Vmin 0.9785 | viol 0.00e+00 | unmet 575.15 | wm_v_mae 1.44e-04
+  ep   2 | ret    34.31 | cost   745.34 | Vmin 0.9839 | viol 0.00e+00 | unmet 642.60 | wm_v_mae 1.52e-04
+  ep   3 | ret    35.15 | cost   736.92 | Vmin 0.9823 | viol 0.00e+00 | unmet 642.30 | wm_v_mae 1.87e-04
+  ep   4 | ret    31.96 | cost   768.85 | Vmin 0.9800 | viol 0.00e+00 | unmet 674.91 | wm_v_mae 1.41e-04
+  ep   5 | ret    38.81 | cost   700.31 | Vmin 0.9861 | viol 0.00e+00 | unmet 587.08 | wm_v_mae 2.13e-04
+  ep   6 | ret    36.93 | cost   719.15 | Vmin 0.9784 | viol 8.89e-05 | unmet 619.34 | wm_v_mae 1.91e-04
+  ep   7 | ret    42.31 | cost   665.34 | Vmin 0.9781 | viol 0.00e+00 | unmet 543.09 | wm_v_mae 2.38e-04
+  ep   8 | ret    38.43 | cost   704.18 | Vmin 0.9707 | viol 0.00e+00 | unmet 627.00 | wm_v_mae 1.43e-04
+  ep   9 | ret    86.90 | cost   219.39 | Vmin 0.9781 | viol 0.00e+00 | unmet  77.29 | wm_v_mae 2.59e-04
+  ep  10 | ret    86.52 | cost   223.26 | Vmin 0.9814 | viol 0.00e+00 | unmet  82.02 | wm_v_mae 2.17e-04
+  ep  11 | ret    86.69 | cost   221.58 | Vmin 0.9752 | viol 0.00e+00 | unmet  80.46 | wm_v_mae 2.18e-04

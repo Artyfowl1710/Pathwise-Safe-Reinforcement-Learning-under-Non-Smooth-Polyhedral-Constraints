@@ -1,0 +1,32 @@
+{
+ "note": "TOU-EV-4 tariff headroom recomputed with current code; oracle variants: old (power-cone degradation kept, no derate), fixed (no discharge atom, tie-break 1e-6, eta derate 0.0132). The pre-existing headroom_jpl_stress_tariff.json could not be reproduced (safe_uncontrolled 459.4 vs 374.4) and is superseded.",
+ "caltech": {
+  "ref": 241.2,
+  "ref_name": "edf_cap_0.35",
+  "oracle_old": null,
+  "oracle_fixed": 232.6,
+  "H_fixed": 3.6,
+  "clairvoyant": 238.1,
+  "H_clair_fixed": 2.3
+ },
+ "jpl": {
+  "ref": 374.4,
+  "ref_name": "safe_uncontrolled",
+  "oracle_old": 340.7,
+  "H_old": 9.0,
+  "oracle_fixed": 317.6,
+  "H_fixed": 15.2,
+  "clairvoyant": 366.2,
+  "H_clair_fixed": 13.3
+ },
+ "lp_breakdown_jpl_8days": {
+  "lp_model_cost": 326.3,
+  "same_plan_sim_efficiency": 380.6,
+  "sim_closed_loop_default": 381.5,
+  "derated_lp_sim": 349.9,
+  "derated_lp_model": 332.9,
+  "unmet_term_accounts_for": "entire gap",
+  "status_default": "optimal_inaccurate on some days (power cone, 6 SOC)",
+  "status_nodischarge_atom_removed": "optimal on all 8 days"
+ }
+}

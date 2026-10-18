@@ -1,0 +1,386 @@
+[
+ {
+  "date": "2018-04-25",
+  "scen": "normal",
+  "uncontrolled": [
+   149.6,
+   100.0,
+   0.0
+  ],
+  "safe_uncontrolled": [
+   149.6,
+   100.0,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   168.9,
+   97.5,
+   0.0
+  ],
+  "oracle_lp": [
+   156.8,
+   98.1,
+   0.0
+  ]
+ },
+ {
+  "date": "2018-04-25",
+  "scen": "stress",
+  "uncontrolled": [
+   148.4,
+   100.0,
+   0.0246
+  ],
+  "safe_uncontrolled": [
+   149.0,
+   100.0,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   153.1,
+   99.3,
+   0.0
+  ],
+  "oracle_lp": [
+   150.2,
+   98.0,
+   0.0
+  ]
+ },
+ {
+  "date": "2018-09-26",
+  "scen": "normal",
+  "uncontrolled": [
+   558.5,
+   90.9,
+   0.0403
+  ],
+  "safe_uncontrolled": [
+   562.6,
+   90.7,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   592.8,
+   88.5,
+   0.0
+  ],
+  "oracle_lp": [
+   565.3,
+   89.6,
+   0.0
+  ]
+ },
+ {
+  "date": "2018-09-26",
+  "scen": "stress",
+  "uncontrolled": [
+   425.9,
+   98.1,
+   0.625
+  ],
+  "safe_uncontrolled": [
+   452.2,
+   96.8,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   461.8,
+   95.7,
+   0.0
+  ],
+  "oracle_lp": [
+   420.7,
+   96.2,
+   0.0
+  ]
+ },
+ {
+  "date": "2019-02-28",
+  "scen": "normal",
+  "uncontrolled": [
+   278.9,
+   86.7,
+   0.0
+  ],
+  "safe_uncontrolled": [
+   278.9,
+   86.7,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   284.4,
+   86.1,
+   0.0
+  ],
+  "oracle_lp": [
+   284.2,
+   85.2,
+   0.0
+  ]
+ },
+ {
+  "date": "2019-02-28",
+  "scen": "stress",
+  "uncontrolled": [
+   210.6,
+   94.8,
+   0.0024
+  ],
+  "safe_uncontrolled": [
+   210.7,
+   94.8,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   219.3,
+   94.0,
+   0.0
+  ],
+  "oracle_lp": [
+   210.3,
+   93.3,
+   0.0
+  ]
+ },
+ {
+  "date": "2019-08-02",
+  "scen": "normal",
+  "uncontrolled": [
+   263.2,
+   85.3,
+   0.0
+  ],
+  "safe_uncontrolled": [
+   263.2,
+   85.3,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   276.8,
+   83.8,
+   0.0
+  ],
+  "oracle_lp": [
+   267.7,
+   84.1,
+   0.0
+  ]
+ },
+ {
+  "date": "2019-08-02",
+  "scen": "stress",
+  "uncontrolled": [
+   189.2,
+   94.1,
+   0.0013
+  ],
+  "safe_uncontrolled": [
+   189.4,
+   94.1,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   202.5,
+   93.0,
+   0.0
+  ],
+  "oracle_lp": [
+   196.3,
+   92.5,
+   0.0
+  ]
+ },
+ {
+  "date": "2020-01-04",
+  "scen": "normal",
+  "uncontrolled": [
+   72.4,
+   84.3,
+   0.0
+  ],
+  "safe_uncontrolled": [
+   72.4,
+   84.3,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   74.8,
+   83.3,
+   0.0
+  ],
+  "oracle_lp": [
+   74.4,
+   83.2,
+   0.0
+  ]
+ },
+ {
+  "date": "2020-01-04",
+  "scen": "stress",
+  "uncontrolled": [
+   42.2,
+   99.6,
+   0.0
+  ],
+  "safe_uncontrolled": [
+   42.2,
+   99.6,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   43.7,
+   99.4,
+   0.0
+  ],
+  "oracle_lp": [
+   45.4,
+   97.9,
+   0.0
+  ]
+ },
+ {
+  "date": "2020-07-21",
+  "scen": "normal",
+  "uncontrolled": [
+   3.8,
+   100.0,
+   0.0
+  ],
+  "safe_uncontrolled": [
+   3.8,
+   100.0,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   3.8,
+   100.0,
+   0.0
+  ],
+  "oracle_lp": [
+   4.2,
+   98.1,
+   0.0
+  ]
+ },
+ {
+  "date": "2020-07-21",
+  "scen": "stress",
+  "uncontrolled": [
+   3.8,
+   100.0,
+   0.0
+  ],
+  "safe_uncontrolled": [
+   3.8,
+   100.0,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   3.8,
+   100.0,
+   0.0
+  ],
+  "oracle_lp": [
+   4.2,
+   98.1,
+   0.0
+  ]
+ },
+ {
+  "date": "2021-04-11",
+  "scen": "normal",
+  "uncontrolled": [
+   326.5,
+   35.4,
+   0.0
+  ],
+  "safe_uncontrolled": [
+   326.5,
+   35.4,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   330.1,
+   34.7,
+   0.0
+  ],
+  "oracle_lp": [
+   328.1,
+   34.9,
+   0.0
+  ]
+ },
+ {
+  "date": "2021-04-11",
+  "scen": "stress",
+  "uncontrolled": [
+   279.7,
+   46.8,
+   0.0
+  ],
+  "safe_uncontrolled": [
+   279.7,
+   46.8,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   287.1,
+   44.8,
+   0.0
+  ],
+  "oracle_lp": [
+   281.2,
+   46.3,
+   0.0
+  ]
+ },
+ {
+  "date": "2021-09-13",
+  "scen": "normal",
+  "uncontrolled": [
+   741.4,
+   63.9,
+   0.0
+  ],
+  "safe_uncontrolled": [
+   741.4,
+   63.9,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   748.2,
+   63.7,
+   0.0
+  ],
+  "oracle_lp": [
+   750.3,
+   63.2,
+   0.0
+  ]
+ },
+ {
+  "date": "2021-09-13",
+  "scen": "stress",
+  "uncontrolled": [
+   533.2,
+   78.4,
+   0.3107
+  ],
+  "safe_uncontrolled": [
+   574.3,
+   75.4,
+   0.0
+  ],
+  "safe_v2g_greedy": [
+   587.2,
+   75.0,
+   0.0
+  ],
+  "oracle_lp": [
+   549.6,
+   77.2,
+   0.0
+  ]
+ }
+]

@@ -1,0 +1,24 @@
+{
+ "Caltech": {
+  "H_unprojected_admitted": 5.2452508849135135,
+  "H_caps_only": 5.2452508849135135,
+  "H_final": 5.2452508849135135,
+  "viol_unprojected": 0.16083464906215972,
+  "viol_projected": 0.0,
+  "cost_cap": 400.52956756989204,
+  "cost_proj_unc": 440.4273258178752,
+  "cost_oracle": 379.520786882592,
+  "clairvoyant_best_heuristic": 382.3734759483906
+ },
+ "JPL": {
+  "H_unprojected_admitted": 12.661017200537392,
+  "H_caps_only": 38.03252587762097,
+  "H_final": 1.6557746975858767,
+  "viol_unprojected": 2.8707321982286054,
+  "viol_projected": 0.0,
+  "cost_cap": 1298.7600940267641,
+  "cost_proj_unc": 818.3590065435844,
+  "cost_oracle": 804.8088251778206,
+  "clairvoyant_best_heuristic": 791.1511598340351
+ }
+}

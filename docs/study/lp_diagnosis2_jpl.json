@@ -1,0 +1,178 @@
+[
+ {
+  "date": "2018-09-05",
+  "safe_uncontrolled_sim": 117.16333654061711,
+  "nodis_tie": {
+   "sim_cost": 84.38728931203869,
+   "lp_cost": 70.47798632586219,
+   "status": "optimal",
+   "iters": 15,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9709478514843594
+  },
+  "nodis_tie_derate": {
+   "sim_cost": 76.98049662768706,
+   "lp_cost": 72.22324373920473,
+   "status": "optimal",
+   "iters": 15,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9828761035516052
+  }
+ },
+ {
+  "date": "2018-10-26",
+  "safe_uncontrolled_sim": 81.34869718625377,
+  "nodis_tie": {
+   "sim_cost": 71.0831646572681,
+   "lp_cost": 52.81398585834428,
+   "status": "optimal",
+   "iters": 18,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9798427745176855
+  },
+  "nodis_tie_derate": {
+   "sim_cost": 59.89882037840849,
+   "lp_cost": 53.57109353776069,
+   "status": "optimal",
+   "iters": 18,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9930083657526487
+  }
+ },
+ {
+  "date": "2018-12-18",
+  "safe_uncontrolled_sim": 425.1155549280752,
+  "nodis_tie": {
+   "sim_cost": 403.5322611588939,
+   "lp_cost": 345.42568698559967,
+   "status": "optimal",
+   "iters": 19,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9296933462778924
+  },
+  "nodis_tie_derate": {
+   "sim_cost": 369.23602991738403,
+   "lp_cost": 350.4162862065886,
+   "status": "optimal",
+   "iters": 19,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9416014616945282
+  }
+ },
+ {
+  "date": "2019-02-07",
+  "safe_uncontrolled_sim": 615.225501069418,
+  "nodis_tie": {
+   "sim_cost": 532.466765462041,
+   "lp_cost": 463.70040725942283,
+   "status": "optimal",
+   "iters": 21,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9214531870594604
+  },
+  "nodis_tie_derate": {
+   "sim_cost": 494.50054059635886,
+   "lp_cost": 474.42693042997644,
+   "status": "optimal",
+   "iters": 21,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9320335159944406
+  }
+ },
+ {
+  "date": "2019-04-01",
+  "safe_uncontrolled_sim": 532.992574018501,
+  "nodis_tie": {
+   "sim_cost": 432.93836312824595,
+   "lp_cost": 361.7496936165651,
+   "status": "optimal",
+   "iters": 19,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9513028636057361
+  },
+  "nodis_tie_derate": {
+   "sim_cost": 388.9125799042615,
+   "lp_cost": 368.840250618402,
+   "status": "optimal",
+   "iters": 21,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9632758214215821
+  }
+ },
+ {
+  "date": "2019-05-22",
+  "safe_uncontrolled_sim": 448.17568632316,
+  "nodis_tie": {
+   "sim_cost": 436.0635078354992,
+   "lp_cost": 367.2237932891835,
+   "status": "optimal",
+   "iters": 21,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9425437732333315
+  },
+  "nodis_tie_derate": {
+   "sim_cost": 394.51704241321056,
+   "lp_cost": 373.72605657307787,
+   "status": "optimal",
+   "iters": 20,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9544745045449968
+  }
+ },
+ {
+  "date": "2019-07-12",
+  "safe_uncontrolled_sim": 631.7426015506488,
+  "nodis_tie": {
+   "sim_cost": 599.3466851426997,
+   "lp_cost": 526.540151349177,
+   "status": "optimal",
+   "iters": 30,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9421740222827291
+  },
+  "nodis_tie_derate": {
+   "sim_cost": 560.2445336484056,
+   "lp_cost": 537.1102406671573,
+   "status": "optimal",
+   "iters": 27,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9539713776446711
+  }
+ },
+ {
+  "date": "2019-09-03",
+  "safe_uncontrolled_sim": 514.321355494755,
+  "nodis_tie": {
+   "sim_cost": 492.7677297253351,
+   "lp_cost": 422.44169986147466,
+   "status": "optimal",
+   "iters": 32,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9606609328252546
+  },
+  "nodis_tie_derate": {
+   "sim_cost": 455.16817080841776,
+   "lp_cost": 432.65262559486524,
+   "status": "optimal",
+   "iters": 28,
+   "warn": [],
+   "viol": 0.0,
+   "served": 0.9727195283265414
+  }
+ }
+]

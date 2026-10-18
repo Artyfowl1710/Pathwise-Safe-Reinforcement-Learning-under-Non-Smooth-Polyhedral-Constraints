@@ -1,0 +1,506 @@
+[
+ {
+  "date": "2018-09-05",
+  "safe_uncontrolled_sim": 117.16333654061711,
+  "default": {
+   "sim_cost": 84.13963719692902,
+   "lp_cost": 70.47798562100532,
+   "status": "optimal_inaccurate",
+   "iters": 52,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9713086877713168
+  },
+  "tight_tol": {
+   "sim_cost": 84.24509309691064,
+   "lp_cost": 70.47798588019336,
+   "status": "optimal_inaccurate",
+   "iters": 24,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9711550353936192
+  },
+  "tiebreak_1e-6": {
+   "sim_cost": 83.67657415216229,
+   "lp_cost": 70.47798458179719,
+   "status": "optimal",
+   "iters": 24,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: "
+   ],
+   "viol": 0.0,
+   "served": 0.971983383952418
+  },
+  "tiebreak_1e-6+tight": {
+   "sim_cost": 83.67657415216229,
+   "lp_cost": 70.47798458179719,
+   "status": "optimal_inaccurate",
+   "iters": 25,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.971983383952418
+  },
+  "no_discharge": {
+   "sim_cost": 83.83374469740636,
+   "lp_cost": 70.47798484375522,
+   "status": "optimal_inaccurate",
+   "iters": 43,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9717543818606625
+  }
+ },
+ {
+  "date": "2018-10-26",
+  "safe_uncontrolled_sim": 81.34869718625377,
+  "default": {
+   "sim_cost": 71.01352702752757,
+   "lp_cost": 52.813985805167135,
+   "status": "optimal_inaccurate",
+   "iters": 25,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9799196090869269
+  },
+  "tight_tol": {
+   "sim_cost": 71.01352702752757,
+   "lp_cost": 52.813985805167135,
+   "status": "optimal_inaccurate",
+   "iters": 25,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9799196090869269
+  },
+  "tiebreak_1e-6": {
+   "sim_cost": 70.1470378942598,
+   "lp_cost": 52.813985373049654,
+   "status": "optimal_inaccurate",
+   "iters": 43,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9808756457045755
+  },
+  "tiebreak_1e-6+tight": {
+   "sim_cost": 70.1470378942598,
+   "lp_cost": 52.813985373049654,
+   "status": "optimal_inaccurate",
+   "iters": 43,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9808756457045755
+  },
+  "no_discharge": {
+   "sim_cost": 70.8360211138097,
+   "lp_cost": 52.81398564008873,
+   "status": "optimal_inaccurate",
+   "iters": 22,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9801154592436291
+  }
+ },
+ {
+  "date": "2018-12-18",
+  "safe_uncontrolled_sim": 425.1155549280752,
+  "default": {
+   "sim_cost": 403.455431895847,
+   "lp_cost": 345.42568562716167,
+   "status": "optimal_inaccurate",
+   "iters": 35,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9297181224324127
+  },
+  "tight_tol": {
+   "sim_cost": 403.45585618479276,
+   "lp_cost": 345.425685664183,
+   "status": "optimal_inaccurate",
+   "iters": 34,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9297179858957683
+  },
+  "tiebreak_1e-6": {
+   "sim_cost": 402.9791378634403,
+   "lp_cost": 345.4256802635423,
+   "status": "optimal_inaccurate",
+   "iters": 40,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9298717189634184
+  },
+  "tiebreak_1e-6+tight": {
+   "sim_cost": 402.9791378634403,
+   "lp_cost": 345.4256802635423,
+   "status": "optimal_inaccurate",
+   "iters": 40,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9298717189634184
+  },
+  "no_discharge": {
+   "sim_cost": 403.5282578287724,
+   "lp_cost": 345.42568164152465,
+   "status": "optimal_inaccurate",
+   "iters": 32,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9296946372863981
+  }
+ },
+ {
+  "date": "2019-02-07",
+  "safe_uncontrolled_sim": 615.225501069418,
+  "default": {
+   "sim_cost": 532.4528459683826,
+   "lp_cost": 463.7004049914454,
+   "status": "optimal",
+   "iters": 35,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: "
+   ],
+   "viol": 0.0,
+   "served": 0.9214567928348235
+  },
+  "tight_tol": {
+   "sim_cost": 532.4528459683826,
+   "lp_cost": 463.7004049914454,
+   "status": "optimal_inaccurate",
+   "iters": 36,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9214567928348235
+  },
+  "tiebreak_1e-6": {
+   "sim_cost": 532.2643758492216,
+   "lp_cost": 463.70039497838366,
+   "status": "optimal_inaccurate",
+   "iters": 46,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.921505613408956
+  },
+  "tiebreak_1e-6+tight": {
+   "sim_cost": 532.2989375455696,
+   "lp_cost": 463.70039544163285,
+   "status": "optimal_inaccurate",
+   "iters": 33,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9214966608704247
+  },
+  "no_discharge": {
+   "sim_cost": 532.4101043111201,
+   "lp_cost": 463.7004028538837,
+   "status": "optimal",
+   "iters": 33,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: "
+   ],
+   "viol": 0.0,
+   "served": 0.9214678643057628
+  }
+ },
+ {
+  "date": "2019-04-01",
+  "safe_uncontrolled_sim": 532.992574018501,
+  "default": {
+   "sim_cost": 432.9299911165307,
+   "lp_cost": 361.7496919703366,
+   "status": "optimal",
+   "iters": 32,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: "
+   ],
+   "viol": 0.0,
+   "served": 0.9513049807176771
+  },
+  "tight_tol": {
+   "sim_cost": 432.9299911165307,
+   "lp_cost": 361.7496919703366,
+   "status": "optimal_inaccurate",
+   "iters": 33,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9513049807176771
+  },
+  "tiebreak_1e-6": {
+   "sim_cost": 432.2440609514853,
+   "lp_cost": 361.7496880437408,
+   "status": "optimal_inaccurate",
+   "iters": 53,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9514784308911644
+  },
+  "tiebreak_1e-6+tight": {
+   "sim_cost": 432.2440609514853,
+   "lp_cost": 361.7496880437408,
+   "status": "optimal_inaccurate",
+   "iters": 53,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9514784308911644
+  },
+  "no_discharge": {
+   "sim_cost": 432.91187425636804,
+   "lp_cost": 361.74968962592834,
+   "status": "optimal_inaccurate",
+   "iters": 28,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9513095617132298
+  }
+ },
+ {
+  "date": "2019-05-22",
+  "safe_uncontrolled_sim": 448.17568632316,
+  "default": {
+   "sim_cost": 436.05301271178047,
+   "lp_cost": 367.2237913742745,
+   "status": "optimal_inaccurate",
+   "iters": 39,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9425465782447415
+  },
+  "tight_tol": {
+   "sim_cost": 436.0580294562762,
+   "lp_cost": 367.22379146706703,
+   "status": "optimal_inaccurate",
+   "iters": 34,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9425452377271684
+  },
+  "tiebreak_1e-6": {
+   "sim_cost": 435.41919478473983,
+   "lp_cost": 367.22378685430743,
+   "status": "optimal_inaccurate",
+   "iters": 37,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9427159825730624
+  },
+  "tiebreak_1e-6+tight": {
+   "sim_cost": 435.41919478473983,
+   "lp_cost": 367.22378685430743,
+   "status": "optimal_inaccurate",
+   "iters": 37,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9427159825730624
+  },
+  "no_discharge": {
+   "sim_cost": 435.5993525988831,
+   "lp_cost": 367.22379200391003,
+   "status": "optimal_inaccurate",
+   "iters": 77,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9426678306459882
+  }
+ },
+ {
+  "date": "2019-07-12",
+  "safe_uncontrolled_sim": 631.7426015506488,
+  "default": {
+   "sim_cost": 599.3212024206252,
+   "lp_cost": 526.5401486486919,
+   "status": "optimal",
+   "iters": 32,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: "
+   ],
+   "viol": 0.0,
+   "served": 0.9421806439332411
+  },
+  "tight_tol": {
+   "sim_cost": 599.3212024206252,
+   "lp_cost": 526.5401486486919,
+   "status": "optimal_inaccurate",
+   "iters": 33,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9421806439332411
+  },
+  "tiebreak_1e-6": {
+   "sim_cost": 599.1730090602261,
+   "lp_cost": 526.5401450906382,
+   "status": "optimal_inaccurate",
+   "iters": 36,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9422191519279947
+  },
+  "tiebreak_1e-6+tight": {
+   "sim_cost": 599.1730090602261,
+   "lp_cost": 526.5401450906382,
+   "status": "optimal_inaccurate",
+   "iters": 36,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9422191519279947
+  },
+  "no_discharge": {
+   "sim_cost": 599.2528231473517,
+   "lp_cost": 526.540145635926,
+   "status": "optimal",
+   "iters": 40,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: "
+   ],
+   "viol": 0.0,
+   "served": 0.9421984118835502
+  }
+ },
+ {
+  "date": "2019-09-03",
+  "safe_uncontrolled_sim": 514.321355494755,
+  "default": {
+   "sim_cost": 492.5844321049973,
+   "lp_cost": 422.44169685783913,
+   "status": "optimal",
+   "iters": 46,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: "
+   ],
+   "viol": 0.0,
+   "served": 0.9607112954171431
+  },
+  "tight_tol": {
+   "sim_cost": 492.5837738515186,
+   "lp_cost": 422.4416985806811,
+   "status": "optimal_inaccurate",
+   "iters": 64,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9607114764928092
+  },
+  "tiebreak_1e-6": {
+   "sim_cost": 492.38015946960047,
+   "lp_cost": 422.441691469208,
+   "status": "optimal_inaccurate",
+   "iters": 52,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9607674215277168
+  },
+  "tiebreak_1e-6+tight": {
+   "sim_cost": 492.53953289104606,
+   "lp_cost": 422.4416930860313,
+   "status": "optimal_inaccurate",
+   "iters": 39,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: ",
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, o"
+   ],
+   "viol": 0.0,
+   "served": 0.9607236321187422
+  },
+  "no_discharge": {
+   "sim_cost": 492.41073094880767,
+   "lp_cost": 422.4416964847212,
+   "status": "optimal",
+   "iters": 46,
+   "warn": [
+    "Power atom with exponent 1.35 is being approximated with rational 27/20 (error: "
+   ],
+   "viol": 0.0,
+   "served": 0.9607590213582327
+  }
+ }
+]

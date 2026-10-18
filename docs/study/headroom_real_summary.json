@@ -1,0 +1,62 @@
+{
+ "caltech_stress_fixed": {
+  "n": 20,
+  "best": "edf_cap_0.6",
+  "ref": 400.52956756989204,
+  "safe_unc": 440.4273258178752,
+  "oracle": 379.520786882592,
+  "H": 5.2452508849135135,
+  "clairvoyant": 382.3734759483906,
+  "H_clairvoyant": 4.533021552355988
+ },
+ "caltech_stress_tariff": {
+  "n": 20,
+  "best": "edf_cap_0.8",
+  "ref": 241.72892686248875,
+  "safe_unc": 258.27813051192237,
+  "oracle": 242.638890283916,
+  "H": -0.37643960664455217,
+  "clairvoyant": 236.28921020168036,
+  "H_clairvoyant": 2.2503374881165357
+ },
+ "caltech_stress_wep": {
+  "n": 20,
+  "best": "edf_cap_0.6",
+  "ref": 331.5117791313398,
+  "safe_unc": 375.3731788073002,
+  "oracle": 306.14172349773946,
+  "H": 7.652836861506841,
+  "clairvoyant": 310.3672936254831,
+  "H_clairvoyant": 6.378200364783886
+ },
+ "jpl_stress_fixed": {
+  "n": 20,
+  "best": "safe_uncontrolled",
+  "ref": 818.3590065435844,
+  "safe_unc": 818.3590065435844,
+  "oracle": 804.8088251778206,
+  "H": 1.6557746975858767,
+  "clairvoyant": 791.1511598340351,
+  "H_clairvoyant": 3.324683481454458
+ },
+ "jpl_stress_tariff": {
+  "n": 20,
+  "best": "safe_uncontrolled",
+  "ref": 459.35582217201966,
+  "safe_unc": 459.35582217201966,
+  "oracle": 493.33505511335227,
+  "H": -7.397148637556195,
+  "clairvoyant": 446.5450193718978,
+  "H_clairvoyant": 2.7888626162496872
+ },
+ "jpl_stress_wep": {
+  "n": 20,
+  "best": "safe_uncontrolled",
+  "ref": 685.3607495122445,
+  "safe_unc": 685.3607495122445,
+  "oracle": 657.243931368401,
+  "H": 4.102484445433092,
+  "clairvoyant": 654.2155175113877,
+  "H_clairvoyant": 4.54435595020902
+ }
+}
