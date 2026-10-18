@@ -1,9 +1,9 @@
-﻿<#
+<#
 .SYNOPSIS
   One-shot, resumable runner for the PIFSRL-V2G study (Windows PowerShell 5.1 or 7+, NVIDIA GPU).
 
 .DESCRIPTION
-  Put the data files in .\data first (see docs\RUN_WINDOWS.md), then:
+  Put the data files in .\data first (see data\README.md), then:
       powershell -ExecutionPolicy Bypass -File .\RUN_ALL.ps1
   It creates a venv, installs a CUDA build of torch (verified), runs the checks, the tests and every
   experiment in a fixed order, and writes everything to a time-stamped "safe" folder OUTSIDE the repo

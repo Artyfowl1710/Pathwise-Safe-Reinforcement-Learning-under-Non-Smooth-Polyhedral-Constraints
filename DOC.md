@@ -18,7 +18,7 @@ the professor's 5-day Caltech run; nothing here is estimated from memory.
 > (2) **Learning headroom is small** (§6.6): on 20 real days with demand charge + stress, oracle beats a tuned fixed EDF cap by only 5.2 %;
 > a per-day scalar cap already reaches the oracle.  (3) **Safe residual SafeTD3 around the tuned EDF** removes the late-degradation
 > problem and is within +1.8 % (res 0.1) to +6.4 % (res 0.3) of the EDF over 3 seeds, but **does not beat it** (§6.7-6.10).
-> (4) The external Optuna/Antigravity result (291.9) is a train-day validation number, not comparable to held-out test costs (§6.8).
+> (4) The Optuna hyperparameter validation result (291.9) is a train-day validation number, not comparable to held-out test costs (§6.8).
 > (5) Therefore the defensible paper is a **safety + benchmark + headroom-methodology paper**, not "RL beats heuristics"; see §9.1.
 
 1. **Starting point.** Pipeline, real-data loader, world model, safety layer all worked. SafeTD3
@@ -400,7 +400,7 @@ is also fed into the critic target and the model-based term. Same 60-episode, 4 
   noise of 0.25 on the residual, the QP margin shaving the base, critic noise from a 4-day val set. Day-to-day std (134)
   is far larger than the differences, so paired per-day comparisons and >= 5 seeds are mandatory.
 
-### 6.8 Review of the external Optuna/Antigravity report (12 trials, `docs/study/antigravity_optuna_best.json`)
+### 6.8 Review of the Optuna hyperparameter study (12 trials, `docs/study/optuna_best.json`)
 The report claims "SafeTD3 291.89 outperforms safe greedy (300-313)". We do not accept this as stated:
 the 291.89 is the **validation** cost of the training day 2019-10-18 (unstressed, no demand charge), whereas the
 table next to it lists **held-out stress+demand test days** (baselines 437-548): different benchmarks. On that same

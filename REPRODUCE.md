@@ -4,11 +4,11 @@ Principle: every claim in `docs/FINDINGS.md` has (i) one command, (ii) its expec
 we produced it with, (iv) a SHA-256 of that file in `docs/study/MANIFEST.json`. Nothing depends on a hidden state: synthetic prices
 depend only on (scenario, date, price_seed); training depends only on (seed, data, package versions).
 
-## 0. Environment (tested: Python 3.13, CPU)
-```
+## 0. Environment (tested: Python 3.10–3.13, CPU & CUDA)
+```bash
 python -m venv .venv && . .venv/bin/activate            # Windows: .venv\Scripts\Activate.ps1
-pip install -r requirements-lock.txt                    # exact versions used for the reported numbers (torch CPU or CUDA build)
-export PYTHONPATH=.                                     # PowerShell: $env:PYTHONPATH="."
+pip install -e .                                        # installs package locally in editable mode
+pip install -r requirements-lock.txt                    # or pip install -r requirements.txt for flexible versions
 python sample.py --tests                                # unit tests incl. tests/test_reproducibility.py (bit-exact CPU re-runs)
 python scripts/make_manifest.py --verify                # code/evidence hashes vs docs/study/MANIFEST.json
 ```

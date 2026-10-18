@@ -140,4 +140,4 @@ reference in addition to the original papers.
 * Prices are a pluggable module (`pifsrl/env/pricing.py`): synthetic scenarios `duck|volatile|solar_glut|winter_peak|tou3|flat` now, `historical_lmp|historical_tariff` later — select with `--price-scenario`; no agent/baseline/safety code changes.
 * `docs/FINDINGS.md` — every publishable finding with strength and caveats; `REPRODUCE.md` — claim → command → expected number; `docs/study/MANIFEST.json` — SHA-256 of data, code and evidence (`python scripts/make_manifest.py --verify`); `requirements-lock.txt` — exact versions.
 
-* `docs/PAPER_COMMANDS.md` — the ordered command list (setup, data placement, every experiment, tables, hashes) for the professor.
+* `REPRODUCE.md` — the complete ordered command list (setup, data placement, every experiment, tables, manifest verification).

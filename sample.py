@@ -2,7 +2,7 @@
 """
 Main entry point for the Physics-Informed Federated Safe RL V2G pipeline.
 
-QUICKTEST (run this first -- this is what the professor's instructions ask for)
+QUICKTEST (run this first -- fast end-to-end pipeline verification)
 --------------------------------------------------------------------------------
     python sample.py --quicktest
 
